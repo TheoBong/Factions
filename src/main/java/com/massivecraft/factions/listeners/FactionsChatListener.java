@@ -170,7 +170,7 @@ public class FactionsChatListener implements Listener {
                     continue;
                 }
                 FPlayer you = FPlayers.getInstance().getByPlayer(listeningPlayer);
-                String yourFormat = formatStart + me.getChatTag(you).trim() + formatEnd;
+                String yourFormat = formatStart + me.getChatTag(you) + formatEnd;
                 try {
                     listeningPlayer.sendMessage(String.format(yourFormat, talkingPlayer.getDisplayName(), msg));
                 } catch (UnknownFormatConversionException ex) {

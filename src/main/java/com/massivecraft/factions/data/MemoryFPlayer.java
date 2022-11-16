@@ -526,7 +526,7 @@ public abstract class MemoryFPlayer implements FPlayer {
 
     @Override
     public String getChatTag(FPlayer fplayer) {
-        return this.hasFaction() ? this.getRelationTo(fplayer).getColor() + getChatTag() : TL.NOFACTION_PREFIX.toString();
+        return this.hasFaction() ? this.getRelationTo(fplayer).getColor() + getChatTag() + " " : TL.NOFACTION_PREFIX.toString();
     }
 
     public int getKills() {
