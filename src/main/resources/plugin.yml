@@ -1,5 +1,5 @@
 name: Factions
-version: ${project.version}-b${build.number}
+version: ${factions.desc}
 main: com.massivecraft.factions.FactionsPlugin
 authors: [Olof Larsson, Brett Flannigan, drtshock, dariasc, CmdrKittens, mbaxter, Theo Bong]
 loadbefore: [Gonzo]

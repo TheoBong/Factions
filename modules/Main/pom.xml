@@ -28,6 +28,24 @@
         </resources>
         <plugins>
             <plugin>
+                <groupId>net.md-5</groupId>
+                <artifactId>scriptus</artifactId>
+                <version>0.2</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <format>git-Factions-%s</format>
+                            <scmDirectory>${project.basedir}</scmDirectory>
+                            <descriptionProperty>factions.desc</descriptionProperty>
+                        </configuration>
+                        <goals>
+                            <goal>describe</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
