@@ -17,7 +17,7 @@ public class CmdClaimAt extends FCommand {
         this.requiredArgs.add("x");
         this.requiredArgs.add("z");
 
-        this.requirements = new CommandRequirements.Builder(Permission.CLAIMAT)
+        this.requirements = new CommandRequirements.Builder(Permission.ADMIN)
                 .memberOnly()
                 .build();
     }

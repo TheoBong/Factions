@@ -4,13 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.massivecraft.factions.FactionsPlugin;
 import com.massivecraft.factions.config.annotation.Comment;
 import com.massivecraft.factions.config.annotation.WipeOnReload;
-import com.massivecraft.factions.perms.PermSelector;
-import com.massivecraft.factions.perms.PermSelectorRegistry;
-import com.massivecraft.factions.perms.PermissibleAction;
-import com.massivecraft.factions.perms.PermissibleActionRegistry;
-import com.massivecraft.factions.perms.PermissibleActions;
-import com.massivecraft.factions.perms.Relation;
-import com.massivecraft.factions.perms.Role;
+import com.massivecraft.factions.perms.*;
 import com.massivecraft.factions.perms.selector.RelationAtLeastSelector;
 import com.massivecraft.factions.perms.selector.RoleAtLeastSelector;
 

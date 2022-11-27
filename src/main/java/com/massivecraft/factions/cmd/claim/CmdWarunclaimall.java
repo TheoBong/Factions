@@ -20,7 +20,7 @@ public class CmdWarunclaimall extends FCommand {
         //this.requiredArgs.add("");
         this.optionalArgs.put("world", "all");
 
-        this.requirements = new CommandRequirements.Builder(Permission.MANAGE_WAR_ZONE).build();
+        this.requirements = new CommandRequirements.Builder(Permission.ADMIN).build();
     }
 
     @Override

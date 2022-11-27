@@ -1,11 +1,6 @@
 package com.massivecraft.factions.listeners;
 
-import com.massivecraft.factions.Board;
-import com.massivecraft.factions.FLocation;
-import com.massivecraft.factions.FPlayer;
-import com.massivecraft.factions.FPlayers;
-import com.massivecraft.factions.Faction;
-import com.massivecraft.factions.FactionsPlugin;
+import com.massivecraft.factions.*;
 import com.massivecraft.factions.config.file.MainConfig;
 import com.massivecraft.factions.perms.PermissibleAction;
 import com.massivecraft.factions.perms.PermissibleActions;
@@ -21,14 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.block.BlockDispenseEvent;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.EntityBlockFormEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Directional;
 
@@ -220,12 +208,7 @@ public class FactionsBlockListener implements Listener {
             return;
         }
 
-        List<Block> blocks;
-        if (FactionsPlugin.getMCVersion() < 800) {
-            blocks = Collections.singletonList(event.getBlock().getRelative(event.getDirection(), 2));
-        } else {
-            blocks = event.getBlocks();
-        }
+        List<Block> blocks = event.getBlocks();
 
         // if the retracted blocks list is empty, no worries
         if (blocks.isEmpty()) {
@@ -314,10 +297,6 @@ public class FactionsBlockListener implements Listener {
         Faction otherFaction = Board.getInstance().getFactionAt(loc);
 
         if (otherFaction.isWilderness()) {
-            if (conf.worldGuard().isBuildPriority() && FactionsPlugin.getInstance().getWorldguard() != null && FactionsPlugin.getInstance().getWorldguard().playerCanBuild(player, location)) {
-                return true;
-            }
-
             if (!conf.factions().protection().isWildernessDenyBuild() || conf.factions().protection().getWorldsNoWildernessProtection().contains(location.getWorld().getName())) {
                 return true; // This is not faction territory. Use whatever you like here.
             }
@@ -328,11 +307,7 @@ public class FactionsBlockListener implements Listener {
 
             return false;
         } else if (otherFaction.isSafeZone()) {
-            if (conf.worldGuard().isBuildPriority() && FactionsPlugin.getInstance().getWorldguard() != null && FactionsPlugin.getInstance().getWorldguard().playerCanBuild(player, location)) {
-                return true;
-            }
-
-            if (!conf.factions().protection().isSafeZoneDenyBuild() || Permission.MANAGE_SAFE_ZONE.has(player)) {
+            if (!conf.factions().protection().isSafeZoneDenyBuild() || Permission.ADMIN.has(player)) {
                 return true;
             }
 
@@ -342,11 +317,7 @@ public class FactionsBlockListener implements Listener {
 
             return false;
         } else if (otherFaction.isWarZone()) {
-            if (conf.worldGuard().isBuildPriority() && FactionsPlugin.getInstance().getWorldguard() != null && FactionsPlugin.getInstance().getWorldguard().playerCanBuild(player, location)) {
-                return true;
-            }
-
-            if (!conf.factions().protection().isWarZoneDenyBuild() || Permission.MANAGE_WAR_ZONE.has(player)) {
+            if (!conf.factions().protection().isWarZoneDenyBuild() || Permission.ADMIN.has(player)) {
                 return true;
             }
 
@@ -373,24 +344,6 @@ public class FactionsBlockListener implements Listener {
                 me.msg(TL.PERM_DENIED_TERRITORY, permissibleAction.getShortDescription(), otherFaction.getTag(myFaction));
             }
             return false;
-        }
-
-        // Also cancel and/or cause pain if player doesn't have ownership rights for this claim
-        if (conf.factions().ownedArea().isEnabled() && (conf.factions().ownedArea().isDenyBuild() || conf.factions().ownedArea().isPainBuild()) && !otherFaction.playerHasOwnershipRights(me, loc)) {
-            if (pain && conf.factions().ownedArea().isPainBuild()) {
-                player.damage(conf.factions().other().getActionDeniedPainAmount());
-
-                if (!conf.factions().ownedArea().isDenyBuild()) {
-                    me.msg(TL.PERM_DENIED_PAINOWNED, permissibleAction.getShortDescription(), otherFaction.getOwnerListString(loc));
-                }
-            }
-            if (conf.factions().ownedArea().isDenyBuild()) {
-                if (!justCheck) {
-                    me.msg(TL.PERM_DENIED_OWNED, permissibleAction.getShortDescription(), otherFaction.getOwnerListString(loc));
-                }
-
-                return false;
-            }
         }
 
         return true;

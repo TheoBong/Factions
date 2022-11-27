@@ -1,10 +1,6 @@
 package com.massivecraft.factions.cmd;
 
-import com.massivecraft.factions.FPlayer;
-import com.massivecraft.factions.FPlayers;
-import com.massivecraft.factions.Faction;
-import com.massivecraft.factions.Factions;
-import com.massivecraft.factions.FactionsPlugin;
+import com.massivecraft.factions.*;
 import com.massivecraft.factions.event.FactionRenameEvent;
 import com.massivecraft.factions.perms.Role;
 import com.massivecraft.factions.scoreboards.FTeamWrapper;
@@ -23,7 +19,7 @@ public class CmdTag extends FCommand {
 
         this.requiredArgs.add("faction tag");
 
-        this.requirements = new CommandRequirements.Builder(Permission.TAG)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .memberOnly()
                 .withRole(Role.MODERATOR)
                 .build();
@@ -45,20 +41,10 @@ public class CmdTag extends FCommand {
             return;
         }
 
-        // if economy is enabled, they're not on the bypass list, and this command has a cost set, make sure they can pay
-        if (!context.canAffordCommand(FactionsPlugin.getInstance().conf().economy().getCostTag(), TL.COMMAND_TAG_TOCHANGE.toString())) {
-            return;
-        }
-
         // trigger the faction rename event (cancellable)
         FactionRenameEvent renameEvent = new FactionRenameEvent(context.fPlayer, tag);
         Bukkit.getServer().getPluginManager().callEvent(renameEvent);
         if (renameEvent.isCancelled()) {
-            return;
-        }
-
-        // then make 'em pay (if applicable)
-        if (!context.payForCommand(FactionsPlugin.getInstance().conf().economy().getCostTag(), TL.COMMAND_TAG_TOCHANGE, TL.COMMAND_TAG_FORCHANGE)) {
             return;
         }
 

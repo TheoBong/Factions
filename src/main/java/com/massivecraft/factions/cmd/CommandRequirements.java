@@ -53,7 +53,7 @@ public class CommandRequirements {
                 return false;
             }
 
-            if (!FactionsPlugin.getInstance().getPermUtil().has(context.sender, permission.node, informIfNot)) {
+            if (!permission.node.equals("factions.everyone") && !FactionsPlugin.getInstance().getPermUtil().has(context.sender, permission.node, informIfNot)) {
                 return false;
             }
 

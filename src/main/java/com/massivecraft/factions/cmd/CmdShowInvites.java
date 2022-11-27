@@ -14,7 +14,7 @@ public class CmdShowInvites extends FCommand {
         super();
         this.aliases.add("showinvites");
 
-        this.requirements = new CommandRequirements.Builder(Permission.SHOW_INVITES)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .memberOnly()
                 .build();
     }

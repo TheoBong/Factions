@@ -13,7 +13,7 @@ public class CmdMapHeight extends FCommand {
 
         this.optionalArgs.put("height", "height");
 
-        this.requirements = new CommandRequirements.Builder(Permission.MAPHEIGHT)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .playerOnly()
                 .build();
     }

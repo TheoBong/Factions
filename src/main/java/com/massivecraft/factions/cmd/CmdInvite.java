@@ -17,7 +17,7 @@ public class CmdInvite extends FCommand {
 
         this.requiredArgs.add("player");
 
-        this.requirements = new CommandRequirements.Builder(Permission.INVITE)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .memberOnly()
                 .withAction(PermissibleActions.INVITE)
                 .build();
@@ -33,16 +33,6 @@ public class CmdInvite extends FCommand {
         if (target.getFaction() == context.faction) {
             context.msg(TL.COMMAND_INVITE_ALREADYMEMBER, target.getName(), context.faction.getTag());
             context.msg(TL.GENERIC_YOUMAYWANT + FCmdRoot.getInstance().cmdKick.getUsageTemplate(context));
-            return;
-        }
-
-        // if economy is enabled, they're not on the bypass list, and this command has a cost set, make 'em pay
-        if (!context.payForCommand(FactionsPlugin.getInstance().conf().economy().getCostInvite(), TL.COMMAND_INVITE_TOINVITE.toString(), TL.COMMAND_INVITE_FORINVITE.toString())) {
-            return;
-        }
-
-        if (context.faction.isBanned(target)) {
-            context.msg(TL.COMMAND_INVITE_BANNED, target.getName());
             return;
         }
 

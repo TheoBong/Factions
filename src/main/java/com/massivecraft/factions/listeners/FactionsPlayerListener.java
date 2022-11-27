@@ -1,23 +1,15 @@
 package com.massivecraft.factions.listeners;
 
-import com.massivecraft.factions.Board;
-import com.massivecraft.factions.FLocation;
-import com.massivecraft.factions.FPlayer;
-import com.massivecraft.factions.FPlayers;
-import com.massivecraft.factions.Faction;
-import com.massivecraft.factions.FactionsPlugin;
+import com.massivecraft.factions.*;
 import com.massivecraft.factions.config.file.MainConfig;
 import com.massivecraft.factions.data.MemoryFPlayer;
 import com.massivecraft.factions.event.FPlayerJoinEvent;
 import com.massivecraft.factions.event.FPlayerLeaveEvent;
-import com.massivecraft.factions.gui.GUI;
-import com.massivecraft.factions.integration.Graves;
 import com.massivecraft.factions.perms.PermissibleActions;
 import com.massivecraft.factions.perms.Relation;
 import com.massivecraft.factions.perms.Role;
 import com.massivecraft.factions.scoreboards.FScoreboard;
 import com.massivecraft.factions.scoreboards.FTeamWrapper;
-import com.massivecraft.factions.scoreboards.sidebar.FDefaultSidebar;
 import com.massivecraft.factions.struct.ChatMode;
 import com.massivecraft.factions.struct.Permission;
 import com.massivecraft.factions.util.TL;
@@ -33,21 +25,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.player.PlayerBucketEmptyEvent;
-import org.bukkit.event.player.PlayerBucketFillEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -75,7 +53,6 @@ public class FactionsPlayerListener extends AbstractListener {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerJoin(PlayerJoinEvent event) {
         initPlayer(event.getPlayer());
-        this.plugin.updateNotification(event.getPlayer());
     }
 
     private void initPlayer(Player player) {
@@ -134,12 +111,12 @@ public class FactionsPlayerListener extends AbstractListener {
         me.login(); // set kills / deaths
         me.setOfflinePlayer(player);
 
-        if (me.isSpyingChat() && !player.hasPermission(Permission.CHATSPY.node)) {
+        if (me.isSpyingChat() && !player.hasPermission(Permission.ADMIN.node)) {
             me.setSpyingChat(false);
             FactionsPlugin.getInstance().log(Level.INFO, "Found %s spying chat without permission on login. Disabled their chat spying.", player.getName());
         }
 
-        if (me.isAdminBypassing() && !player.hasPermission(Permission.BYPASS.node)) {
+        if (me.isAdminBypassing() && !player.hasPermission(Permission.ADMIN.node)) {
             me.setIsAdminBypassing(false);
             FactionsPlugin.getInstance().log(Level.INFO, "Found %s on admin Bypass without permission on login. Disabled it for them.", player.getName());
         }
@@ -150,21 +127,8 @@ public class FactionsPlayerListener extends AbstractListener {
     }
 
     private void initFactionWorld(FPlayer me) {
-        // Check for Faction announcements. Let's delay this so they actually see it.
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (me.isOnline()) {
-                    me.getFaction().sendUnreadAnnouncements(me);
-                }
-            }
-        }.runTaskLater(FactionsPlugin.getInstance(), 33L); // Don't ask me why.
-
-        if (FactionsPlugin.getInstance().conf().scoreboard().constant().isEnabled()) {
-            FScoreboard.init(me);
-            FScoreboard.get(me).setDefaultSidebar(new FDefaultSidebar());
-            FScoreboard.get(me).setSidebarVisibility(me.showScoreboard());
-        }
+        FScoreboard.init(me);
+        FScoreboard.get(me).setSidebarVisibility(me.showScoreboard());
 
         Faction myFaction = me.getFaction();
         if (!myFaction.isWilderness()) {
@@ -176,17 +140,13 @@ public class FactionsPlayerListener extends AbstractListener {
         }
 
         // If they have the permission, don't let them autoleave. Bad inverted setter :\
-        me.setAutoLeave(!me.getPlayer().hasPermission(Permission.AUTO_LEAVE_BYPASS.node));
+        me.setAutoLeave(false);
         me.setTakeFallDamage(true);
         if (me.isFlying()) {
             me.getPlayer().setAllowFlight(true);
             me.getPlayer().setFlying(true);
         }
         me.flightCheck();
-
-        if (FactionsPlugin.getInstance().getSeeChunkUtil() != null) {
-            FactionsPlugin.getInstance().getSeeChunkUtil().updatePlayerInfo(UUID.fromString(me.getId()), me.isSeeingChunk());
-        }
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -221,9 +181,6 @@ public class FactionsPlayerListener extends AbstractListener {
 
         FScoreboard.remove(me, event.getPlayer());
 
-        if (FactionsPlugin.getInstance().getSeeChunkUtil() != null) {
-            FactionsPlugin.getInstance().getSeeChunkUtil().updatePlayerInfo(UUID.fromString(me.getId()), false);
-        }
         me.setOfflinePlayer(null);
     }
 
@@ -330,25 +287,10 @@ public class FactionsPlayerListener extends AbstractListener {
                 me.sendFancyMessage(Board.getInstance().getMap(me, to, player.getLocation().getYaw()));
                 showTimes.put(player.getUniqueId(), System.currentTimeMillis() + FactionsPlugin.getInstance().conf().commands().map().getCooldown());
             }
-        } else {
-            Faction myFaction = me.getFaction();
-            String ownersTo = myFaction.getOwnerListString(to);
+        }
 
-            if (changedFaction) {
-                me.sendFactionHereMessage(factionFrom);
-                if (FactionsPlugin.getInstance().conf().factions().ownedArea().isEnabled() && FactionsPlugin.getInstance().conf().factions().ownedArea().isMessageOnBorder() && myFaction == factionTo && !ownersTo.isEmpty()) {
-                    me.sendMessage(TL.GENERIC_OWNERS.format(ownersTo));
-                }
-            } else if (FactionsPlugin.getInstance().conf().factions().ownedArea().isEnabled() && FactionsPlugin.getInstance().conf().factions().ownedArea().isMessageInsideTerritory() && myFaction == factionTo && !myFaction.isWilderness()) {
-                String ownersFrom = myFaction.getOwnerListString(from);
-                if (FactionsPlugin.getInstance().conf().factions().ownedArea().isMessageByChunk() || !ownersFrom.equals(ownersTo)) {
-                    if (!ownersTo.isEmpty()) {
-                        me.sendMessage(TL.GENERIC_OWNERS.format(ownersTo));
-                    } else if (!TL.GENERIC_PUBLICLAND.toString().isEmpty()) {
-                        me.sendMessage(TL.GENERIC_PUBLICLAND.toString());
-                    }
-                }
-            }
+        if (changedFaction) {
+            me.sendFactionHereMessage(factionFrom);
         }
     }
 
@@ -361,18 +303,7 @@ public class FactionsPlayerListener extends AbstractListener {
         boolean check = false;
         switch (event.getRightClicked().getType()) {
             case ITEM_FRAME:
-            case GLOW_ITEM_FRAME:
-                if (!canPlayerUseBlock(event.getPlayer(), Material.ITEM_FRAME, event.getRightClicked().getLocation(), false)) {
-                    event.setCancelled(true);
-                }
-                break;
             case HORSE:
-            case SKELETON_HORSE:
-            case ZOMBIE_HORSE:
-            case DONKEY:
-            case MULE:
-            case LLAMA:
-            case TRADER_LLAMA:
             case PIG:
             case LEASH_HITCH:
             case MINECART_CHEST:
@@ -407,10 +338,6 @@ public class FactionsPlayerListener extends AbstractListener {
 
         if (block == null) {
             return;  // clicked in air, apparently
-        }
-
-        if (Graves.allowAnyway(block)) {
-            return;
         }
 
         if (event.getAction() == Action.PHYSICAL && block.getType().name().contains("SOIL")) {
@@ -450,13 +377,10 @@ public class FactionsPlayerListener extends AbstractListener {
             boolean ohNo = false;
             switch (item.getType()) {
                 case ARMOR_STAND:
-                case END_CRYSTAL:
                 case MINECART:
-                case CHEST_MINECART:
-                case COMMAND_BLOCK_MINECART:
-                case FURNACE_MINECART:
+                case STORAGE_MINECART:
                 case HOPPER_MINECART:
-                case TNT_MINECART:
+                case EXPLOSIVE_MINECART:
                     ohNo = true;
             }
             if (ohNo &&
@@ -532,7 +456,7 @@ public class FactionsPlayerListener extends AbstractListener {
 
             return false;
         } else if (otherFaction.isSafeZone()) {
-            if (!facConf.protection().isSafeZoneDenyUsage() || Permission.MANAGE_SAFE_ZONE.has(player)) {
+            if (!facConf.protection().isSafeZoneDenyUsage() || Permission.ADMIN.has(player)) {
                 return true;
             }
 
@@ -542,7 +466,7 @@ public class FactionsPlayerListener extends AbstractListener {
 
             return false;
         } else if (otherFaction.isWarZone()) {
-            if (!facConf.protection().isWarZoneDenyUsage() || Permission.MANAGE_WAR_ZONE.has(player)) {
+            if (!facConf.protection().isWarZoneDenyUsage() || Permission.ADMIN.has(player)) {
                 return true;
             }
 
@@ -557,15 +481,6 @@ public class FactionsPlayerListener extends AbstractListener {
             if (!justCheck) {
                 me.msg(TL.PLAYER_USE_TERRITORY, TextUtil.getMaterialName(material), otherFaction.getTag(me.getFaction()));
             }
-            return false;
-        }
-
-        // Also cancel if player doesn't have ownership rights for this claim
-        if (facConf.ownedArea().isEnabled() && facConf.ownedArea().isDenyUsage() && !otherFaction.playerHasOwnershipRights(me, loc)) {
-            if (!justCheck) {
-                me.msg(TL.PLAYER_USE_OWNED, TextUtil.getMaterialName(material), otherFaction.getOwnerListString(loc));
-            }
-
             return false;
         }
 
@@ -723,23 +638,6 @@ public class FactionsPlayerListener extends AbstractListener {
         return false;
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onPlayerInteractGUI(InventoryClickEvent event) {
-        if (!plugin.worldUtil().isEnabled(event.getWhoClicked().getWorld())) {
-            return;
-        }
-
-        Inventory clickedInventory = getClickedInventory(event);
-        if (clickedInventory == null) {
-            return;
-        }
-        if (clickedInventory.getHolder() instanceof GUI) {
-            event.setCancelled(true);
-            GUI<?> ui = (GUI<?>) clickedInventory.getHolder();
-            ui.click(event.getRawSlot(), event.getClick());
-        }
-    }
-
     private Inventory getClickedInventory(InventoryClickEvent event) {
         int rawSlot = event.getRawSlot();
         InventoryView view = event.getView();
@@ -750,17 +648,6 @@ public class FactionsPlayerListener extends AbstractListener {
             return view.getTopInventory();
         } else {
             return view.getBottomInventory();
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onPlayerMoveGUI(InventoryDragEvent event) {
-        if (!plugin.worldUtil().isEnabled(event.getWhoClicked().getWorld())) {
-            return;
-        }
-
-        if (event.getInventory().getHolder() instanceof GUI) {
-            event.setCancelled(true);
         }
     }
 

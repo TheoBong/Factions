@@ -17,7 +17,7 @@ public class CmdChat extends FCommand {
 
         this.optionalArgs.put("mode", "next");
 
-        this.requirements = new CommandRequirements.Builder(Permission.CHAT)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .memberOnly()
                 .noDisableOnLock()
                 .brigadier(ChatBrigadier.class)

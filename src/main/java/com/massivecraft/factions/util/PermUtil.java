@@ -1,6 +1,7 @@
 package com.massivecraft.factions.util;
 
 import com.massivecraft.factions.FactionsPlugin;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
 
@@ -19,10 +20,6 @@ public class PermUtil {
         this.setup();
     }
 
-    public String getForbiddenMessage(String perm) {
-        return plugin.txt().parse(TL.GENERIC_NOPERMISSION.toString(), getPermissionDescription(perm));
-    }
-
     /**
      * This method hooks into all permission plugins we are supporting
      */
@@ -33,14 +30,6 @@ public class PermUtil {
         }
     }
 
-    public String getPermissionDescription(String perm) {
-        String desc = permissionDescriptions.get(perm);
-        if (desc == null) {
-            return TL.GENERIC_DOTHAT.toString();
-        }
-        return desc;
-    }
-
     public boolean has(CommandSender me, String perm, boolean informSenderIfNot) {
         if (me == null) {
             return false; // What? How?
@@ -48,7 +37,7 @@ public class PermUtil {
         if (me.hasPermission(perm)) {
             return true;
         } else if (informSenderIfNot) {
-            me.sendMessage(this.getForbiddenMessage(perm));
+            me.sendMessage(ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.");
         }
         return false;
     }

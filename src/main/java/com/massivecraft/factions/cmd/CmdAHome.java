@@ -17,7 +17,7 @@ public class CmdAHome extends FCommand {
 
         this.requiredArgs.add("player");
 
-        this.requirements = new CommandRequirements.Builder(Permission.AHOME).noDisableOnLock().build();
+        this.requirements = new CommandRequirements.Builder(Permission.ADMIN).noDisableOnLock().build();
     }
 
     @Override

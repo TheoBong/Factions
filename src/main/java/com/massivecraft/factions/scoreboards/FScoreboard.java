@@ -2,10 +2,8 @@ package com.massivecraft.factions.scoreboards;
 
 import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.FPlayers;
-import com.massivecraft.factions.FactionsPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Scoreboard;
 
@@ -18,8 +16,6 @@ public class FScoreboard {
     private final Scoreboard scoreboard;
     private final FPlayer fplayer;
     private final BufferedObjective bufferedObjective;
-    private FSidebarProvider defaultProvider;
-    private FSidebarProvider temporaryProvider;
     private boolean removed = false;
 
     // Glowstone doesn't support scoreboards.
@@ -87,66 +83,5 @@ public class FScoreboard {
         }
 
         bufferedObjective.setDisplaySlot(visible ? DisplaySlot.SIDEBAR : null);
-    }
-
-    public void setDefaultSidebar(final FSidebarProvider provider) {
-        if (!isSupportedByServer()) {
-            return;
-        }
-
-        defaultProvider = provider;
-        if (temporaryProvider == null) {
-            // We have no temporary provider; update the BufferedObjective!
-            updateObjective();
-        }
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (removed || provider != defaultProvider) {
-                    cancel();
-                    return;
-                }
-
-                if (temporaryProvider == null) {
-                    updateObjective();
-                }
-            }
-        }.runTaskTimer(FactionsPlugin.getInstance(), 20, 20);
-    }
-
-    public void setTemporarySidebar(final FSidebarProvider provider) {
-        if (!isSupportedByServer()) {
-            return;
-        }
-
-        temporaryProvider = provider;
-        updateObjective();
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (removed) {
-                    return;
-                }
-
-                if (temporaryProvider == provider) {
-                    temporaryProvider = null;
-                    updateObjective();
-                }
-            }
-        }.runTaskLater(FactionsPlugin.getInstance(), FactionsPlugin.getInstance().conf().scoreboard().info().getExpiration() * 20L);
-    }
-
-    private void updateObjective() {
-        FSidebarProvider provider = temporaryProvider != null ? temporaryProvider : defaultProvider;
-
-        if (provider == null) {
-            bufferedObjective.hide();
-        } else {
-            bufferedObjective.setTitle(provider.getTitle(fplayer));
-            bufferedObjective.setAllLines(provider.getLines(fplayer));
-            bufferedObjective.flip();
-        }
     }
 }

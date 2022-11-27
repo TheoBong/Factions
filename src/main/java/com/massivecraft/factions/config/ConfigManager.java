@@ -1,7 +1,6 @@
 package com.massivecraft.factions.config;
 
 import com.massivecraft.factions.FactionsPlugin;
-import com.massivecraft.factions.config.file.DynmapConfig;
 import com.massivecraft.factions.config.file.MainConfig;
 import com.massivecraft.factions.config.file.PermissionsConfig;
 import com.massivecraft.factions.config.file.TranslationsConfig;
@@ -14,7 +13,6 @@ public class ConfigManager {
     private final FactionsPlugin plugin;
     private PermissionsConfig permissionsConfig = null;
     private final MainConfig mainConfig = new MainConfig();
-    private final DynmapConfig dynmapConfig = new DynmapConfig();
     private final TranslationsConfig translationsConfig = new TranslationsConfig();
 
     public ConfigManager(FactionsPlugin plugin) {
@@ -30,7 +28,6 @@ public class ConfigManager {
         this.loadConfig("translations", this.translationsConfig);
         this.loadConfig("permissions", this.permissionsConfig);
         this.loadConfig("main", this.mainConfig);
-        this.loadConfig("dynmap", this.dynmapConfig);
     }
 
     private void loadConfig(String name, Object config) {
@@ -47,10 +44,6 @@ public class ConfigManager {
 
     public MainConfig getMainConfig() {
         return this.mainConfig;
-    }
-
-    public DynmapConfig getDynmapConfig() {
-        return this.dynmapConfig;
     }
 
     public TranslationsConfig getTranslationsConfig() {

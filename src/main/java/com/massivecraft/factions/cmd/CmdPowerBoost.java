@@ -23,7 +23,7 @@ public class CmdPowerBoost extends FCommand {
         this.requiredArgs.add("name");
         this.optionalArgs.put("#/reset", "");
 
-        this.requirements = new CommandRequirements.Builder(Permission.POWERBOOST)
+        this.requirements = new CommandRequirements.Builder(Permission.ADMIN)
                 .brigadier(CmdPowerBoost.Brigadier.class)
                 .build();
     }

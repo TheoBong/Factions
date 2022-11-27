@@ -15,7 +15,7 @@ public class CmdTitle extends FCommand {
         this.requiredArgs.add("player");
         this.optionalArgs.put("title", "title");
 
-        this.requirements = new CommandRequirements.Builder(Permission.TITLE)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .memberOnly()
                 .withRole(Role.MODERATOR)
                 .build();
@@ -34,11 +34,6 @@ public class CmdTitle extends FCommand {
         title = title.replaceAll(",", "");
 
         if (!context.canIAdministerYou(context.fPlayer, you)) {
-            return;
-        }
-
-        // if economy is enabled, they're not on the bypass list, and this command has a cost set, make 'em pay
-        if (!context.payForCommand(FactionsPlugin.getInstance().conf().economy().getCostTitle(), TL.COMMAND_TITLE_TOCHANGE, TL.COMMAND_TITLE_FORCHANGE)) {
             return;
         }
 

@@ -1,40 +1,17 @@
 package com.massivecraft.factions.listeners;
 
-import com.massivecraft.factions.Board;
-import com.massivecraft.factions.FLocation;
-import com.massivecraft.factions.FPlayer;
-import com.massivecraft.factions.FPlayers;
-import com.massivecraft.factions.Faction;
-import com.massivecraft.factions.FactionsPlugin;
+import com.massivecraft.factions.*;
 import com.massivecraft.factions.config.file.MainConfig;
 import com.massivecraft.factions.perms.PermissibleActions;
 import com.massivecraft.factions.perms.Relation;
 import com.massivecraft.factions.util.TL;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Enderman;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Silverfish;
-import org.bukkit.entity.TNTPrimed;
-import org.bukkit.entity.Wither;
+import org.bukkit.entity.*;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityCombustByEntityEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;
@@ -220,9 +197,7 @@ public class FactionsEntityListener extends AbstractListener {
             if (fPlayer.getFaction().isPeaceful()) {
                 if (event.getPotion().getEffects().stream().allMatch(e -> e.getType().equals(PotionEffectType.WEAKNESS))) {
                     for (LivingEntity target : event.getAffectedEntities()) {
-                        if (target.getType() != EntityType.ZOMBIE_VILLAGER) {
-                            event.setIntensity(target, 0);
-                        }
+                        event.setIntensity(target, 0);
                     }
                     return;
                 }
@@ -273,7 +248,6 @@ public class FactionsEntityListener extends AbstractListener {
         if (damager instanceof TNTPrimed || damager instanceof Creeper || damager instanceof ExplosiveMinecart) {
             switch (damagee.getType()) {
                 case ITEM_FRAME:
-                case GLOW_ITEM_FRAME:
                 case ARMOR_STAND:
                 case PAINTING:
                     if (explosionDisallowed(damager, new FLocation(damagee.getLocation()))) {
@@ -287,7 +261,6 @@ public class FactionsEntityListener extends AbstractListener {
             Material material = null;
             switch (damagee.getType()) {
                 case ITEM_FRAME:
-                case GLOW_ITEM_FRAME:
                     material = Material.ITEM_FRAME;
                     break;
                 case ARMOR_STAND:
@@ -333,10 +306,6 @@ public class FactionsEntityListener extends AbstractListener {
         Location defenderLoc = defender.getPlayer().getLocation();
 
         if (damager == damagee) {  // ender pearl usage and other self-inflicted damage
-            return true;
-        }
-
-        if (FactionsPlugin.getInstance().conf().worldGuard().isPVPPriority() && FactionsPlugin.getInstance().getWorldguard() != null && FactionsPlugin.getInstance().getWorldguard().isCustomPVPFlag((Player) damagee)) {
             return true;
         }
 

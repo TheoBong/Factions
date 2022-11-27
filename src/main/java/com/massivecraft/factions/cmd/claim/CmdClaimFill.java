@@ -29,7 +29,7 @@ public class CmdClaimFill extends FCommand {
         this.optionalArgs.put("limit", String.valueOf(FactionsPlugin.getInstance().conf().factions().claims().getFillClaimMaxClaims()));
         this.optionalArgs.put("faction", "you");
 
-        this.requirements = new CommandRequirements.Builder(Permission.CLAIM_FILL)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .playerOnly()
                 .build();
     }
@@ -65,9 +65,9 @@ public class CmdClaimFill extends FCommand {
                 (
                         (forFaction.isNormal() && !forFaction.hasAccess(context.fPlayer, PermissibleActions.TERRITORY, null))
                                 ||
-                                (forFaction.isWarZone() && !Permission.MANAGE_WAR_ZONE.has(context.player))
+                                (forFaction.isWarZone() && !Permission.ADMIN.has(context.player))
                                 ||
-                                (forFaction.isSafeZone() && !Permission.MANAGE_SAFE_ZONE.has(context.player))
+                                (forFaction.isSafeZone() && !Permission.ADMIN.has(context.player))
                 )
         ) {
             context.msg(TL.CLAIM_CANTCLAIM, forFaction.describeTo(context.fPlayer));

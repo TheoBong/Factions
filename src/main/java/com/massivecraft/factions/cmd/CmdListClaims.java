@@ -9,15 +9,7 @@ import com.massivecraft.factions.util.TL;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 public class CmdListClaims extends FCommand {
 
@@ -29,7 +21,7 @@ public class CmdListClaims extends FCommand {
         this.optionalArgs.put("world", "currentworld");
         this.optionalArgs.put("faction", "yours");
 
-        this.requirements = new CommandRequirements.Builder(Permission.LISTCLAIMS)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .withAction(PermissibleActions.LISTCLAIMS)
                 .memberOnly()
                 .build();
@@ -47,7 +39,7 @@ public class CmdListClaims extends FCommand {
         }
         Faction faction = context.faction;
         if (context.argIsSet(1)) {
-            if (Permission.LISTCLAIMS_OTHER.has(context.sender, true)) {
+            if (Permission.ADMIN.has(context.sender, true)) {
                 faction = context.argAsFaction(1);
             } else {
                 return;

@@ -6,7 +6,6 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
-import io.papermc.lib.PaperLib;
 import me.lucko.commodore.Commodore;
 import me.lucko.commodore.CommodoreProvider;
 

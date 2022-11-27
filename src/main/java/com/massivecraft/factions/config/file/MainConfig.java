@@ -13,14 +13,7 @@ import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal", "InnerClassMayBeStatic", "BooleanMethodIsAlwaysInverted", "MismatchedQueryAndUpdateOfCollection"})
 public class MainConfig {
@@ -2699,7 +2692,7 @@ public class MainConfig {
             }
 
             public int getPrefixLength() {
-                return prefixLength < 1 ? (FactionsPlugin.getMCVersion() < 1300 ? 16 : 32) : prefixLength;
+                return prefixLength < 1 ? 16 : prefixLength;
             }
 
             public String getPrefixTemplate() {
@@ -2711,7 +2704,7 @@ public class MainConfig {
             }
 
             public int getSuffixLength() {
-                return suffixLength < 1 ? (FactionsPlugin.getMCVersion() < 1300 ? 16 : 32) : suffixLength;
+                return suffixLength < 1 ? 16 : suffixLength;
             }
 
             public String getSuffixTemplate() {

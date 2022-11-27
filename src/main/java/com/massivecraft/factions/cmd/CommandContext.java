@@ -1,11 +1,6 @@
 package com.massivecraft.factions.cmd;
 
-import com.massivecraft.factions.FPlayer;
-import com.massivecraft.factions.FPlayers;
-import com.massivecraft.factions.Faction;
-import com.massivecraft.factions.Factions;
-import com.massivecraft.factions.FactionsPlugin;
-import com.massivecraft.factions.integration.Econ;
+import com.massivecraft.factions.*;
 import com.massivecraft.factions.perms.PermissibleActions;
 import com.massivecraft.factions.perms.Role;
 import com.massivecraft.factions.util.TL;
@@ -379,36 +374,6 @@ public class CommandContext {
         i.sendMessage(FactionsPlugin.getInstance().txt().parse("%s <b>has a higher rank than you.", you.describeTo(i, true)));
 
         return false;
-    }
-
-    // if economy is enabled and they're not on the bypass list, make 'em pay; returns true unless person can't afford the cost
-    public boolean payForCommand(double cost, String toDoThis, String forDoingThis) {
-        if (!Econ.shouldBeUsed() || this.fPlayer == null || cost == 0.0 || fPlayer.isAdminBypassing()) {
-            return true;
-        }
-
-        if (FactionsPlugin.getInstance().conf().economy().isBankEnabled() && FactionsPlugin.getInstance().conf().economy().isBankFactionPaysCosts() && fPlayer.hasFaction() && fPlayer.getFaction().hasAccess(fPlayer, PermissibleActions.ECONOMY, fPlayer.getLastStoodAt())) {
-            return Econ.modifyMoney(faction, -cost, toDoThis, forDoingThis);
-        } else {
-            return Econ.modifyMoney(fPlayer, -cost, toDoThis, forDoingThis);
-        }
-    }
-
-    public boolean payForCommand(double cost, TL toDoThis, TL forDoingThis) {
-        return payForCommand(cost, toDoThis.toString(), forDoingThis.toString());
-    }
-
-    // like above, but just make sure they can pay; returns true unless person can't afford the cost
-    public boolean canAffordCommand(double cost, String toDoThis) {
-        if (!Econ.shouldBeUsed() || fPlayer == null || cost == 0.0 || fPlayer.isAdminBypassing()) {
-            return true;
-        }
-
-        if (FactionsPlugin.getInstance().conf().economy().isBankEnabled() && FactionsPlugin.getInstance().conf().economy().isBankFactionPaysCosts() && fPlayer.hasFaction()) {
-            return Econ.hasAtLeast(faction, cost, toDoThis);
-        } else {
-            return Econ.hasAtLeast(fPlayer, cost, toDoThis);
-        }
     }
 
     public void doWarmUp(WarmUpUtil.Warmup warmup, TL translationKey, String action, Runnable runnable, long delay) {

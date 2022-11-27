@@ -1,7 +1,6 @@
 package com.massivecraft.factions.cmd;
 
 import com.massivecraft.factions.FactionsPlugin;
-import com.massivecraft.factions.integration.Econ;
 import com.massivecraft.factions.struct.Permission;
 import com.massivecraft.factions.util.TL;
 
@@ -20,7 +19,7 @@ public class CmdHelp extends FCommand {
         //this.requiredArgs.add("");
         this.optionalArgs.put("page", "1");
 
-        this.requirements = new CommandRequirements.Builder(Permission.HELP).noDisableOnLock().build();
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE).noDisableOnLock().build();
     }
 
     @Override
@@ -89,46 +88,21 @@ public class CmdHelp extends FCommand {
         pageLines.add(FCmdRoot.getInstance().cmdSethome.getUsageTemplate(context, true));
         helpPages.add(pageLines);
 
-        if (Econ.isSetup() && FactionsPlugin.getInstance().conf().economy().isEnabled() && FactionsPlugin.getInstance().conf().economy().isBankEnabled()) {
-            pageLines = new ArrayList<>();
-            pageLines.add("");
-            pageLines.add(plugin.txt().parse(TL.COMMAND_HELP_BANK_1.toString()));
-            pageLines.add(plugin.txt().parse(TL.COMMAND_HELP_BANK_2.toString()));
-            pageLines.add(plugin.txt().parse(TL.COMMAND_HELP_BANK_3.toString()));
-            pageLines.add("");
-            pageLines.add(FCmdRoot.getInstance().cmdMoney.getUsageTemplate(context, true));
-            pageLines.add("");
-            pageLines.add("");
-            pageLines.add("");
-            helpPages.add(pageLines);
-        }
-
         pageLines = new ArrayList<>();
         pageLines.add(FCmdRoot.getInstance().cmdClaim.getUsageTemplate(context, true));
         pageLines.add(FCmdRoot.getInstance().cmdAutoClaim.getUsageTemplate(context, true));
         pageLines.add(FCmdRoot.getInstance().cmdUnclaim.getUsageTemplate(context, true));
         pageLines.add(FCmdRoot.getInstance().cmdUnclaimall.getUsageTemplate(context, true));
         pageLines.add(FCmdRoot.getInstance().cmdKick.getUsageTemplate(context, true));
-        pageLines.add(FCmdRoot.getInstance().cmdMod.getUsageTemplate(context, true));
-        pageLines.add(FCmdRoot.getInstance().cmdAdmin.getUsageTemplate(context, true));
+        pageLines.add(FCmdRoot.getInstance().cmdPromote.getUsageTemplate(context, true));
+        pageLines.add(FCmdRoot.getInstance().cmdDemote.getUsageTemplate(context, true));
         pageLines.add(FCmdRoot.getInstance().cmdTitle.getUsageTemplate(context, true));
-        pageLines.add(FCmdRoot.getInstance().cmdSB.getUsageTemplate(context, true));
-        pageLines.add(FCmdRoot.getInstance().cmdSeeChunk.getUsageTemplate(context, true));
         pageLines.add(FCmdRoot.getInstance().cmdStatus.getUsageTemplate(context, true));
         pageLines.add(plugin.txt().parse(TL.COMMAND_HELP_PLAYERTITLES.toString()));
         helpPages.add(pageLines);
 
         pageLines = new ArrayList<>();
-        pageLines.add(FCmdRoot.getInstance().cmdMap.getUsageTemplate(context, true));
-        pageLines.add(FCmdRoot.getInstance().cmdBoom.getUsageTemplate(context, true));
-        pageLines.add(FCmdRoot.getInstance().cmdOwner.getUsageTemplate(context, true));
-        pageLines.add(FCmdRoot.getInstance().cmdOwnerList.getUsageTemplate(context, true));
-        pageLines.add(plugin.txt().parse(TL.COMMAND_HELP_OWNERSHIP_1.toString()));
-        pageLines.add(plugin.txt().parse(TL.COMMAND_HELP_OWNERSHIP_2.toString()));
-        pageLines.add(plugin.txt().parse(TL.COMMAND_HELP_OWNERSHIP_3.toString()));
-        helpPages.add(pageLines);
-
-        pageLines = new ArrayList<>();
+        pageLines.add(FCmdRoot.getInstance().cmdFly.getUsageTemplate(context, true));
         pageLines.add(FCmdRoot.getInstance().cmdDisband.getUsageTemplate(context, true));
         pageLines.add("");
         pageLines.add(FCmdRoot.getInstance().cmdRelationAlly.getUsageTemplate(context, true));
@@ -164,6 +138,9 @@ public class CmdHelp extends FCommand {
         pageLines.add(plugin.txt().parse(TL.COMMAND_HELP_PERMISSIONS_9.toString()));
         helpPages.add(pageLines);
 
+        if (!context.sender.hasPermission("factions.admin")) {
+            return;
+        }
         pageLines = new ArrayList<>();
         pageLines.add(TL.COMMAND_HELP_MOAR_1.toString());
         pageLines.add(FCmdRoot.getInstance().cmdBypass.getUsageTemplate(context, true));

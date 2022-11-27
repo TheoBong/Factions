@@ -17,7 +17,7 @@ public class CmdAutoUnclaim extends FCommand {
         //this.requiredArgs.add("");
         this.optionalArgs.put("faction", "your");
 
-        this.requirements = new CommandRequirements.Builder(Permission.AUTOCLAIM)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .playerOnly()
                 .build();
     }

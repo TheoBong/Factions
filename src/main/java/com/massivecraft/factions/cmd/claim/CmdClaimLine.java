@@ -25,7 +25,7 @@ public class CmdClaimLine extends FCommand {
         this.optionalArgs.put("direction", "facing");
         this.optionalArgs.put("faction", "you");
 
-        this.requirements = new CommandRequirements.Builder(Permission.CLAIM_LINE)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .playerOnly()
                 .build();
     }

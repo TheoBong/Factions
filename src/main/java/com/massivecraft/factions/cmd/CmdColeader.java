@@ -20,7 +20,7 @@ public class CmdColeader extends FCommand {
 
         this.requiredArgs.add("player");
 
-        this.requirements = new CommandRequirements.Builder(Permission.COLEADER)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .memberOnly()
                 .withRole(Role.ADMIN)
                 .build();
@@ -43,7 +43,7 @@ public class CmdColeader extends FCommand {
             return;
         }
 
-        boolean permAny = Permission.COLEADER_ANY.has(context.sender, false);
+        boolean permAny = Permission.ADMIN.has(context.sender, false);
         Faction targetFaction = target.getFaction();
 
         if (targetFaction != context.faction && !permAny) {

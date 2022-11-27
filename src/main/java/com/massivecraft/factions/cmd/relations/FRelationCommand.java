@@ -25,7 +25,7 @@ public abstract class FRelationCommand extends FCommand {
         this.aliases.add(alias);
         this.requiredArgs.add("faction tag");
 
-        this.requirements = new CommandRequirements.Builder(Permission.RELATION)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .memberOnly()
                 .withRole(Role.MODERATOR)
                 .build();
@@ -61,11 +61,6 @@ public abstract class FRelationCommand extends FCommand {
         FactionRelationWishEvent wishEvent = new FactionRelationWishEvent(context.fPlayer, context.faction, them, oldRelation, targetRelation);
         Bukkit.getPluginManager().callEvent(wishEvent);
         if (wishEvent.isCancelled()) {
-            return;
-        }
-
-        // if economy is enabled, they're not on the bypass list, and this command has a cost set, make 'em pay
-        if (!context.payForCommand(targetRelation.getRelationCost(), TL.COMMAND_RELATIONS_TOMARRY, TL.COMMAND_RELATIONS_FORMARRY)) {
             return;
         }
 

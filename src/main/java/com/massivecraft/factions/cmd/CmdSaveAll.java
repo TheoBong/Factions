@@ -13,7 +13,7 @@ public class CmdSaveAll extends FCommand {
         this.aliases.add("saveall");
         this.aliases.add("save");
 
-        this.requirements = new CommandRequirements.Builder(Permission.SAVE).noDisableOnLock().build();
+        this.requirements = new CommandRequirements.Builder(Permission.ADMIN).noDisableOnLock().build();
     }
 
     @Override

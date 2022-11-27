@@ -12,7 +12,7 @@ public class CmdChatSpy extends FCommand {
 
         this.optionalArgs.put("on/off", "flip");
 
-        this.requirements = new CommandRequirements.Builder(Permission.CHATSPY)
+        this.requirements = new CommandRequirements.Builder(Permission.ADMIN)
                 .playerOnly()
                 .noDisableOnLock()
                 .build();

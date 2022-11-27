@@ -17,7 +17,7 @@ public class CmdJoin extends FCommand {
         this.requiredArgs.add("faction");
         this.optionalArgs.put("player", "you");
 
-        this.requirements = new CommandRequirements.Builder(Permission.JOIN)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .build();
     }
 
@@ -34,7 +34,7 @@ public class CmdJoin extends FCommand {
         }
         boolean samePlayer = fplayer == context.fPlayer;
 
-        if (!samePlayer && !Permission.JOIN_OTHERS.has(context.sender, false)) {
+        if (!samePlayer && !Permission.ADMIN.has(context.sender, false)) {
             context.msg(TL.COMMAND_JOIN_CANNOTFORCE);
             return;
         }
@@ -65,22 +65,8 @@ public class CmdJoin extends FCommand {
             return;
         }
 
-        if (!(faction.getOpen() || faction.isInvited(fplayer) || (context.fPlayer == null || context.fPlayer.isAdminBypassing()) || Permission.JOIN_ANY.has(context.sender, false))) {
+        if (!(faction.getOpen() || faction.isInvited(fplayer) || (context.fPlayer == null || context.fPlayer.isAdminBypassing()) || Permission.ADMIN.has(context.sender, false))) {
             context.msg(TL.COMMAND_JOIN_REQUIRESINVITATION);
-            if (samePlayer && !faction.isBanned(fplayer)) {
-                faction.msg(TL.COMMAND_JOIN_ATTEMPTEDJOIN, fplayer.describeTo(faction, true));
-            }
-            return;
-        }
-
-        // if economy is enabled, they're not on the bypass list, and this command has a cost set, make sure they can pay
-        if (samePlayer && !context.canAffordCommand(FactionsPlugin.getInstance().conf().economy().getCostJoin(), TL.COMMAND_JOIN_TOJOIN.toString())) {
-            return;
-        }
-
-        // Check for ban
-        if (!(context.fPlayer == null || context.fPlayer.isAdminBypassing()) && faction.isBanned(fplayer)) {
-            context.msg(TL.COMMAND_JOIN_BANNED, faction.getTag(context.fPlayer));
             return;
         }
 
@@ -88,11 +74,6 @@ public class CmdJoin extends FCommand {
         FPlayerJoinEvent joinEvent = new FPlayerJoinEvent(fplayer, faction, FPlayerJoinEvent.PlayerJoinReason.COMMAND);
         Bukkit.getServer().getPluginManager().callEvent(joinEvent);
         if (joinEvent.isCancelled()) {
-            return;
-        }
-
-        // then make 'em pay (if applicable)
-        if (samePlayer && !context.payForCommand(FactionsPlugin.getInstance().conf().economy().getCostJoin(), TL.COMMAND_JOIN_TOJOIN.toString(), TL.COMMAND_JOIN_FORJOIN.toString())) {
             return;
         }
 

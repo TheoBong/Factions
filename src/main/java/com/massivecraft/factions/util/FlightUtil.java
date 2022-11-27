@@ -24,11 +24,6 @@ public class FlightUtil {
             enemiesTask = new EnemiesTask();
             enemiesTask.runTaskTimer(FactionsPlugin.getInstance(), 0, (long) enemyCheck);
         }
-
-        double spawnRate = FactionsPlugin.getInstance().conf().commands().fly().particles().getSpawnRate() * 20;
-        if (spawnRate > 0) {
-            new ParticleTrailsTask().runTaskTimer(FactionsPlugin.getInstance(), 0, (long) spawnRate);
-        }
     }
 
     public static void start() {
@@ -93,30 +88,4 @@ public class FlightUtil {
             return false;
         }
     }
-
-    public class ParticleTrailsTask extends BukkitRunnable {
-
-        private final int amount;
-        private final float speed;
-
-        private ParticleTrailsTask() {
-            this.amount = FactionsPlugin.getInstance().conf().commands().fly().particles().getAmount();
-            this.speed = (float) FactionsPlugin.getInstance().conf().commands().fly().particles().getSpeed();
-        }
-
-        @Override
-        public void run() {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                FPlayer pilot = FPlayers.getInstance().getByPlayer(player);
-                if (pilot.isFlying()) {
-                    if (pilot.getFlyTrailsEffect() != null && Permission.FLY_TRAILS.has(player) && pilot.getFlyTrailsState()) {
-                        Object effect = FactionsPlugin.getInstance().getParticleProvider().effectFromString(pilot.getFlyTrailsEffect());
-                        FactionsPlugin.getInstance().getParticleProvider().spawn(effect, player.getLocation(), amount, speed, 0, 0, 0);
-                    }
-                }
-            }
-        }
-
-    }
-
 }

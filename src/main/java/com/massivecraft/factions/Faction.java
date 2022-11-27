@@ -5,7 +5,6 @@ import com.massivecraft.factions.perms.PermissibleAction;
 import com.massivecraft.factions.perms.Relation;
 import com.massivecraft.factions.perms.Role;
 import com.massivecraft.factions.perms.Selectable;
-import com.massivecraft.factions.struct.BanInfo;
 import com.massivecraft.factions.util.LazyLocation;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -15,35 +14,6 @@ import java.util.Map;
 import java.util.Set;
 
 public interface Faction extends EconomyParticipator, Selectable {
-    Map<String, List<String>> getAnnouncements();
-
-    Map<String, LazyLocation> getWarps();
-
-    LazyLocation getWarp(String name);
-
-    void setWarp(String name, LazyLocation loc);
-
-    boolean isWarp(String name);
-
-    boolean hasWarpPassword(String warp);
-
-    boolean isWarpPassword(String warp, String password);
-
-    void setWarpPassword(String warp, String password);
-
-    boolean removeWarp(String name);
-
-    void clearWarps();
-
-    int getMaxVaults();
-
-    void setMaxVaults(int value);
-
-    void addAnnouncement(FPlayer fPlayer, String msg);
-
-    void sendUnreadAnnouncements(FPlayer fPlayer);
-
-    void removeAnnouncements(FPlayer fPlayer);
 
     Set<String> getInvites();
 
@@ -54,14 +24,6 @@ public interface Faction extends EconomyParticipator, Selectable {
     void deinvite(FPlayer fplayer);
 
     boolean isInvited(FPlayer fplayer);
-
-    void ban(FPlayer target, FPlayer banner);
-
-    void unban(FPlayer player);
-
-    boolean isBanned(FPlayer player);
-
-    Set<BanInfo> getBannedPlayers();
 
     boolean getOpen();
 
@@ -96,10 +58,6 @@ public interface Faction extends EconomyParticipator, Selectable {
     String getDescription();
 
     void setDescription(String value);
-
-    String getLink();
-
-    void setLink(String value);
 
     void setHome(Location home);
 
@@ -160,10 +118,6 @@ public interface Faction extends EconomyParticipator, Selectable {
 
     int getLandRoundedInWorld(String worldName);
 
-    int getTNTBank();
-
-    void setTNTBank(int amount);
-
     // -------------------------------
     // Relation and relation colors
     // -------------------------------
@@ -173,24 +127,6 @@ public interface Faction extends EconomyParticipator, Selectable {
     void setRelationWish(Faction otherFaction, Relation relation);
 
     int getRelationCount(Relation relation);
-
-    // ----------------------------------------------//
-    // DTR
-    // ----------------------------------------------//
-
-    double getDTR();
-
-    double getDTRWithoutUpdate();
-
-    void setDTR(double dtr);
-
-    long getLastDTRUpdateTime();
-
-    long getFrozenDTRUntilTime();
-
-    void setFrozenDTR(long time);
-
-    boolean isFrozenDTR();
 
     // ----------------------------------------------//
     // Power
@@ -259,34 +195,6 @@ public interface Faction extends EconomyParticipator, Selectable {
     void sendMessage(String message);
 
     void sendMessage(List<String> messages);
-
-    // ----------------------------------------------//
-    // Ownership of specific claims
-    // ----------------------------------------------//
-
-    Map<FLocation, Set<String>> getClaimOwnership();
-
-    void clearAllClaimOwnership();
-
-    void clearClaimOwnership(FLocation loc);
-
-    void clearClaimOwnership(FPlayer player);
-
-    int getCountOfClaimsWithOwners();
-
-    boolean doesLocationHaveOwnersSet(FLocation loc);
-
-    boolean isPlayerInOwnerList(FPlayer player, FLocation loc);
-
-    void setPlayerAsOwner(FPlayer player, FLocation loc);
-
-    void removePlayerAsOwner(FPlayer player, FLocation loc);
-
-    Set<String> getOwnerList(FLocation loc);
-
-    String getOwnerListString(FLocation loc);
-
-    boolean playerHasOwnershipRights(FPlayer fplayer, FLocation loc);
 
     // ----------------------------------------------//
     // Persistance and entity management

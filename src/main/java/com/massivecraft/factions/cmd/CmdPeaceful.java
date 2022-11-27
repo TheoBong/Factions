@@ -14,7 +14,7 @@ public class CmdPeaceful extends FCommand {
 
         this.requiredArgs.add("faction");
 
-        this.requirements = new CommandRequirements.Builder(Permission.SET_PEACEFUL).build();
+        this.requirements = new CommandRequirements.Builder(Permission.ADMIN).build();
     }
 
     @Override

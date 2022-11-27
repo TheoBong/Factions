@@ -17,7 +17,7 @@ public class CmdDescription extends FCommand {
 
         this.requiredArgs.add("desc");
 
-        this.requirements = new CommandRequirements.Builder(Permission.DESCRIPTION)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .memberOnly()
                 .withRole(Role.MODERATOR)
                 .noErrorOnManyArgs()
@@ -26,11 +26,6 @@ public class CmdDescription extends FCommand {
 
     @Override
     public void perform(CommandContext context) {
-        // if economy is enabled, they're not on the bypass list, and this command has a cost set, make 'em pay
-        if (!context.payForCommand(FactionsPlugin.getInstance().conf().economy().getCostDesc(), TL.COMMAND_DESCRIPTION_TOCHANGE, TL.COMMAND_DESCRIPTION_FORCHANGE)) {
-            return;
-        }
-
         // since "&" color tags seem to work even through plain old FPlayer.sendMessage() for some reason, we need to break those up
         // And replace all the % because it messes with string formatting and this is easy way around that.
         String desc = TextUtil.implode(context.args, " ").replaceAll("%", "").replaceAll("(&([a-f0-9klmnor]))", "& $2");

@@ -1,10 +1,6 @@
 package com.massivecraft.factions.scoreboards;
 
-import com.massivecraft.factions.FPlayer;
-import com.massivecraft.factions.FPlayers;
-import com.massivecraft.factions.Faction;
-import com.massivecraft.factions.Factions;
-import com.massivecraft.factions.FactionsPlugin;
+import com.massivecraft.factions.*;
 import com.massivecraft.factions.config.file.MainConfig;
 import com.massivecraft.factions.tag.Tag;
 import org.bukkit.ChatColor;
@@ -13,12 +9,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class FTeamWrapper {
     private static final Map<Faction, FTeamWrapper> wrappers = new HashMap<>();
@@ -175,37 +166,12 @@ public class FTeamWrapper {
     }
 
     private void updatePrefixAndSuffix(FScoreboard fboard) {
-        MainConfig.Scoreboard.Constant conf = FactionsPlugin.getInstance().conf().scoreboard().constant();
-        if (conf.isPrefixes()) {
-            Team team = teams.get(fboard);
-            String prefix = this.apply(conf.getPrefixTemplate(), fboard.getFPlayer(), conf.getPrefixLength());
+        Team team = teams.get(fboard);
+        String prefix = faction.getRelationTo(fboard.getFPlayer()).getColor() + "";
 
-            if (!prefix.equals(team.getPrefix())) {
-                team.setPrefix(prefix);
-            }
+        if (!prefix.equals(team.getPrefix())) {
+            team.setPrefix(prefix);
         }
-        if (conf.isSuffixes()) {
-            Team team = teams.get(fboard);
-            String suffix = this.apply(conf.getSuffixTemplate(), fboard.getFPlayer(), conf.getSuffixLength());
-
-            if (!suffix.equals(team.getSuffix())) {
-                team.setSuffix(suffix);
-            }
-        }
-    }
-
-    private String apply(String prefixOrSuffix, FPlayer fplayer, int maxLength) {
-        prefixOrSuffix = Tag.parsePlaceholders(fplayer.getPlayer(), prefixOrSuffix);
-        prefixOrSuffix = prefixOrSuffix.replace("{relationcolor}", faction.getRelationTo(fplayer).getColor().toString());
-        int remaining = Math.min("{faction}".length() + maxLength - prefixOrSuffix.length(), faction.getTag().length());
-        prefixOrSuffix = prefixOrSuffix.replace("{faction}", remaining > 0 ? faction.getTag().substring(0, remaining) : "");
-        prefixOrSuffix = Tag.parsePlain(fplayer, prefixOrSuffix);
-        prefixOrSuffix = ChatColor.translateAlternateColorCodes('&', prefixOrSuffix);
-
-        if (prefixOrSuffix.length() > maxLength) {
-            prefixOrSuffix = prefixOrSuffix.substring(0, maxLength);
-        }
-        return prefixOrSuffix;
     }
 
     private void addPlayer(OfflinePlayer player) {

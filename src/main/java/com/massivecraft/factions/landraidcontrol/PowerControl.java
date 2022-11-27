@@ -1,11 +1,6 @@
 package com.massivecraft.factions.landraidcontrol;
 
-import com.massivecraft.factions.Board;
-import com.massivecraft.factions.FLocation;
-import com.massivecraft.factions.FPlayer;
-import com.massivecraft.factions.FPlayers;
-import com.massivecraft.factions.Faction;
-import com.massivecraft.factions.FactionsPlugin;
+import com.massivecraft.factions.*;
 import com.massivecraft.factions.cmd.CommandContext;
 import com.massivecraft.factions.config.file.MainConfig;
 import com.massivecraft.factions.event.PowerLossEvent;
@@ -101,10 +96,7 @@ public class PowerControl implements LandRaidControl {
         MainConfig.Factions.LandRaidControl.Power powerConf = FactionsPlugin.getInstance().conf().factions().landRaidControl().power();
         PowerLossEvent powerLossEvent = new PowerLossEvent(faction, fplayer);
         // Check for no power loss conditions
-        if (FactionsPlugin.getInstance().getWorldguard() != null && FactionsPlugin.getInstance().getWorldguard().isNoLossFlag(player)) {
-            powerLossEvent.setMessage(TL.PLAYER_POWER_NOLOSS_REGION.toString());
-            powerLossEvent.setCancelled(true);
-        } else if (faction.isWarZone()) {
+        if (faction.isWarZone()) {
             // war zones always override worldsNoPowerLoss either way, thus this layout
             if (!powerConf.isWarZonePowerLoss()) {
                 powerLossEvent.setMessage(TL.PLAYER_POWER_NOLOSS_WARZONE.toString());

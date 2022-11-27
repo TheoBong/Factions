@@ -12,7 +12,7 @@ public class CmdSethome extends FCommand {
     public CmdSethome() {
         this.aliases.add("sethome");
 
-        this.requirements = new CommandRequirements.Builder(Permission.SETHOME)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .memberOnly()
                 .withAction(PermissibleActions.SETHOME)
                 .build();
@@ -26,15 +26,10 @@ public class CmdSethome extends FCommand {
         }
 
         // Can the player set the faction home HERE?
-        if (!Permission.BYPASS.has(context.player) &&
+        if (!Permission.ADMIN.has(context.player) &&
                 FactionsPlugin.getInstance().conf().factions().homes().isMustBeInClaimedTerritory() &&
                 Board.getInstance().getFactionAt(new FLocation(context.player)) != context.faction) {
             context.msg(TL.COMMAND_SETHOME_NOTCLAIMED);
-            return;
-        }
-
-        // if economy is enabled, they're not on the bypass list, and this command has a cost set, make 'em pay
-        if (!context.payForCommand(FactionsPlugin.getInstance().conf().economy().getCostSethome(), TL.COMMAND_SETHOME_TOSET, TL.COMMAND_SETHOME_FORSET)) {
             return;
         }
 

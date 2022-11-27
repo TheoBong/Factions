@@ -23,23 +23,18 @@ public class CmdList extends FCommand {
 
         this.optionalArgs.put("page", "1");
 
-        this.requirements = new CommandRequirements.Builder(Permission.LIST).build();
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE).build();
     }
 
     @Override
     public void perform(CommandContext context) {
-        // if economy is enabled, they're not on the bypass list, and this command has a cost set, make 'em pay
-        if (!context.payForCommand(FactionsPlugin.getInstance().conf().economy().getCostList(), "to list the factions", "for listing the factions")) {
-            return;
-        }
-
         ArrayList<Faction> factionList = Factions.getInstance().getAllFactions();
         factionList.remove(Factions.getInstance().getWilderness());
         factionList.remove(Factions.getInstance().getSafeZone());
         factionList.remove(Factions.getInstance().getWarZone());
 
         // remove exempt factions
-        if (!context.sender.hasPermission(Permission.SHOW_BYPASS_EXEMPT.toString())) {
+        if (!context.sender.hasPermission(Permission.ADMIN.toString())) {
             List<String> exemptFactions = FactionsPlugin.getInstance().conf().commands().show().getExempt();
             factionList.removeIf(next -> exemptFactions.contains(next.getTag()));
         }

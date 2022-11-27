@@ -1,14 +1,7 @@
 package com.massivecraft.factions.cmd;
 
-import com.massivecraft.factions.Board;
-import com.massivecraft.factions.FLocation;
-import com.massivecraft.factions.FPlayer;
-import com.massivecraft.factions.FPlayers;
-import com.massivecraft.factions.Faction;
-import com.massivecraft.factions.FactionsPlugin;
+import com.massivecraft.factions.*;
 import com.massivecraft.factions.event.FPlayerTeleportEvent;
-import com.massivecraft.factions.integration.Essentials;
-import com.massivecraft.factions.integration.IntegrationManager;
 import com.massivecraft.factions.perms.PermissibleActions;
 import com.massivecraft.factions.perms.Relation;
 import com.massivecraft.factions.struct.Permission;
@@ -32,7 +25,7 @@ public class CmdHome extends FCommand {
 
         this.optionalArgs.put("faction", "yours");
 
-        this.requirements = new CommandRequirements.Builder(Permission.HOME)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .playerOnly()
                 .noDisableOnLock()
                 .build();
@@ -132,16 +125,6 @@ public class CmdHome extends FCommand {
         FPlayerTeleportEvent tpEvent = new FPlayerTeleportEvent(context.fPlayer, destination, FPlayerTeleportEvent.PlayerTeleportReason.HOME);
         Bukkit.getServer().getPluginManager().callEvent(tpEvent);
         if (tpEvent.isCancelled()) {
-            return;
-        }
-
-        // if economy is enabled, they're not on the bypass list, and this command has a cost set, make 'em pay
-        if (!context.payForCommand(FactionsPlugin.getInstance().conf().economy().getCostHome(), TL.COMMAND_HOME_TOTELEPORT.toString(), TL.COMMAND_HOME_FORTELEPORT.toString())) {
-            return;
-        }
-
-        // if Essentials teleport handling is enabled and available, pass the teleport off to it (for delay and cooldown)
-        if (FactionsPlugin.getInstance().getIntegrationManager().isEnabled(IntegrationManager.Integration.ESS) && Essentials.handleTeleport(context.player, destination)) {
             return;
         }
 

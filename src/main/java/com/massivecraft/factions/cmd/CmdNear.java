@@ -17,7 +17,7 @@ public class CmdNear extends FCommand {
         super();
         this.aliases.add("near");
 
-        this.requirements = new CommandRequirements.Builder(Permission.NEAR)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .memberOnly()
                 .build();
     }

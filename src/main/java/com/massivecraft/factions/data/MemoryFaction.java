@@ -1,27 +1,13 @@
 package com.massivecraft.factions.data;
 
-import com.massivecraft.factions.Board;
-import com.massivecraft.factions.FLocation;
-import com.massivecraft.factions.FPlayer;
-import com.massivecraft.factions.FPlayers;
-import com.massivecraft.factions.Faction;
-import com.massivecraft.factions.Factions;
-import com.massivecraft.factions.FactionsPlugin;
+import com.massivecraft.factions.*;
 import com.massivecraft.factions.config.file.PermissionsConfig;
 import com.massivecraft.factions.event.FactionAutoDisbandEvent;
 import com.massivecraft.factions.event.FactionNewAdminEvent;
 import com.massivecraft.factions.iface.EconomyParticipator;
 import com.massivecraft.factions.iface.RelationParticipator;
-import com.massivecraft.factions.integration.Econ;
-import com.massivecraft.factions.integration.LWC;
-import com.massivecraft.factions.landraidcontrol.DTRControl;
 import com.massivecraft.factions.landraidcontrol.LandRaidControl;
-import com.massivecraft.factions.perms.PermSelector;
-import com.massivecraft.factions.perms.PermissibleAction;
-import com.massivecraft.factions.perms.Relation;
-import com.massivecraft.factions.perms.Role;
-import com.massivecraft.factions.perms.Selectable;
-import com.massivecraft.factions.struct.BanInfo;
+import com.massivecraft.factions.perms.*;
 import com.massivecraft.factions.struct.Permission;
 import com.massivecraft.factions.util.LazyLocation;
 import com.massivecraft.factions.util.MiscUtil;
@@ -33,15 +19,8 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -51,7 +30,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
     protected boolean permanent;
     protected String tag;
     protected String description;
-    protected String link;
     protected boolean open;
     protected boolean peaceful;
     protected Integer permanentPower;
@@ -67,86 +45,9 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
     protected ConcurrentHashMap<String, LazyLocation> warps = new ConcurrentHashMap<>();
     protected ConcurrentHashMap<String, String> warpPasswords = new ConcurrentHashMap<>();
     private long lastDeath;
-    protected int maxVaults;
     protected Role defaultRole;
     protected LinkedHashMap<PermSelector, Map<String, Boolean>> permissions = new LinkedHashMap<>();
-    protected Set<BanInfo> bans = new HashSet<>();
-    protected double dtr;
-    protected long lastDTRUpdateTime;
-    protected long frozenDTRUntilTime;
-    protected int tntBank;
     protected transient OfflinePlayer offlinePlayer;
-
-    public HashMap<String, List<String>> getAnnouncements() {
-        return this.announcements;
-    }
-
-    public void addAnnouncement(FPlayer fPlayer, String msg) {
-        List<String> list = announcements.containsKey(fPlayer.getId()) ? announcements.get(fPlayer.getId()) : new ArrayList<>();
-        list.add(msg);
-        announcements.put(fPlayer.getId(), list);
-    }
-
-    public void sendUnreadAnnouncements(FPlayer fPlayer) {
-        if (!announcements.containsKey(fPlayer.getId())) {
-            return;
-        }
-        fPlayer.msg(TL.FACTIONS_ANNOUNCEMENT_TOP);
-        for (String s : announcements.get(fPlayer.getPlayer().getUniqueId().toString())) {
-            fPlayer.sendMessage(s);
-        }
-        fPlayer.msg(TL.FACTIONS_ANNOUNCEMENT_BOTTOM);
-        announcements.remove(fPlayer.getId());
-    }
-
-    public void removeAnnouncements(FPlayer fPlayer) {
-        announcements.remove(fPlayer.getId());
-    }
-
-    public ConcurrentHashMap<String, LazyLocation> getWarps() {
-        return this.warps;
-    }
-
-    public LazyLocation getWarp(String name) {
-        return this.warps.get(name);
-    }
-
-    public void setWarp(String name, LazyLocation loc) {
-        this.warps.put(name, loc);
-    }
-
-    public boolean isWarp(String name) {
-        return this.warps.containsKey(name);
-    }
-
-    public boolean removeWarp(String name) {
-        warpPasswords.remove(name); // remove password no matter what.
-        return warps.remove(name) != null;
-    }
-
-    public boolean isWarpPassword(String warp, String password) {
-        return hasWarpPassword(warp) && warpPasswords.get(warp.toLowerCase()).equals(password);
-    }
-
-    public boolean hasWarpPassword(String warp) {
-        return warpPasswords.containsKey(warp.toLowerCase());
-    }
-
-    public void setWarpPassword(String warp, String password) {
-        warpPasswords.put(warp.toLowerCase(), password);
-    }
-
-    public void clearWarps() {
-        warps.clear();
-    }
-
-    public int getMaxVaults() {
-        return this.maxVaults;
-    }
-
-    public void setMaxVaults(int value) {
-        this.maxVaults = value;
-    }
 
     public Set<String> getInvites() {
         return invites;
@@ -171,29 +72,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
 
     public boolean isInvited(FPlayer fplayer) {
         return this.invites.contains(fplayer.getId());
-    }
-
-    public void ban(FPlayer target, FPlayer banner) {
-        BanInfo info = new BanInfo(banner.getId(), target.getId(), System.currentTimeMillis());
-        this.bans.add(info);
-    }
-
-    public void unban(FPlayer player) {
-        bans.removeIf(banInfo -> banInfo.getBanned().equalsIgnoreCase(player.getId()));
-    }
-
-    public boolean isBanned(FPlayer player) {
-        for (BanInfo info : bans) {
-            if (info.getBanned().equalsIgnoreCase(player.getId())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public Set<BanInfo> getBannedPlayers() {
-        return this.bans;
     }
 
     public boolean getOpen() {
@@ -273,16 +151,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
         this.description = value;
     }
 
-    public String getLink() {
-        if (this.link == null) {
-            this.link = FactionsPlugin.getInstance().conf().commands().link().getDefaultURL();
-        }
-        return this.link;
-    }
-
-    public void setLink(String value) {
-        this.link = value;
-    }
 
     public void setHome(Location home) {
         this.home = new LazyLocation(home);
@@ -451,9 +319,7 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
         this.permanent = false;
         this.powerBoost = 0.0;
         this.foundedDate = System.currentTimeMillis();
-        this.maxVaults = FactionsPlugin.getInstance().conf().playerVaults().getDefaultMaxVaults();
         this.defaultRole = FactionsPlugin.getInstance().conf().factions().other().getDefaultRole();
-        this.dtr = FactionsPlugin.getInstance().conf().factions().landRaidControl().dtr().getStartingDTR();
 
         resetPerms(); // Reset on new Faction so it has default values.
     }
@@ -477,7 +343,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
         invites = old.invites;
         announcements = old.announcements;
         this.defaultRole = old.defaultRole;
-        this.dtr = old.dtr;
 
         resetPerms(); // Reset on new Faction so it has default values.
     }
@@ -573,50 +438,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
     }
 
     // ----------------------------------------------//
-    // DTR
-    // ----------------------------------------------//
-
-    @Override
-    public double getDTR() {
-        LandRaidControl lrc = FactionsPlugin.getInstance().getLandRaidControl();
-        if (lrc instanceof DTRControl) {
-            ((DTRControl) lrc).updateDTR(this);
-        }
-        return this.dtr;
-    }
-
-    @Override
-    public double getDTRWithoutUpdate() {
-        return this.dtr;
-    }
-
-    @Override
-    public void setDTR(double dtr) {
-        this.dtr = dtr;
-        this.lastDTRUpdateTime = System.currentTimeMillis();
-    }
-
-    @Override
-    public long getLastDTRUpdateTime() {
-        return this.lastDTRUpdateTime;
-    }
-
-    @Override
-    public long getFrozenDTRUntilTime() {
-        return this.frozenDTRUntilTime;
-    }
-
-    @Override
-    public void setFrozenDTR(long time) {
-        this.frozenDTRUntilTime = time;
-    }
-
-    @Override
-    public boolean isFrozenDTR() {
-        return System.currentTimeMillis() < this.frozenDTRUntilTime;
-    }
-
-    // ----------------------------------------------//
     // Power
     // ----------------------------------------------//
     @Deprecated
@@ -694,14 +515,6 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
 
     public int getLandRoundedInWorld(String worldName) {
         return Board.getInstance().getFactionCoordCountInWorld(this, worldName);
-    }
-
-    public int getTNTBank() {
-        return this.tntBank;
-    }
-
-    public void setTNTBank(int amount) {
-        this.tntBank = amount;
     }
 
     // -------------------------------
@@ -938,139 +751,9 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
     }
 
     // ----------------------------------------------//
-    // Ownership of specific claims
-    // ----------------------------------------------//
-
-    public Map<FLocation, Set<String>> getClaimOwnership() {
-        return claimOwnership;
-    }
-
-    public void clearAllClaimOwnership() {
-        claimOwnership.clear();
-    }
-
-    public void clearClaimOwnership(FLocation loc) {
-        if (LWC.getEnabled() && FactionsPlugin.getInstance().conf().lwc().isResetLocksOnUnclaim()) {
-            LWC.clearAllLocks(loc);
-        }
-        claimOwnership.remove(loc);
-    }
-
-    public void clearClaimOwnership(FPlayer player) {
-        if (id == null || id.isEmpty()) {
-            return;
-        }
-
-        Set<String> ownerData;
-
-        for (Entry<FLocation, Set<String>> entry : claimOwnership.entrySet()) {
-            ownerData = entry.getValue();
-
-            if (ownerData == null) {
-                continue;
-            }
-
-            ownerData.removeIf(s -> s.equals(player.getId()));
-
-            if (ownerData.isEmpty()) {
-                if (LWC.getEnabled() && FactionsPlugin.getInstance().conf().lwc().isResetLocksOnUnclaim()) {
-                    LWC.clearAllLocks(entry.getKey());
-                }
-                claimOwnership.remove(entry.getKey());
-            }
-        }
-    }
-
-    public int getCountOfClaimsWithOwners() {
-        return claimOwnership.isEmpty() ? 0 : claimOwnership.size();
-    }
-
-    public boolean doesLocationHaveOwnersSet(FLocation loc) {
-        if (claimOwnership.isEmpty() || !claimOwnership.containsKey(loc)) {
-            return false;
-        }
-
-        Set<String> ownerData = claimOwnership.get(loc);
-        return ownerData != null && !ownerData.isEmpty();
-    }
-
-    public boolean isPlayerInOwnerList(FPlayer player, FLocation loc) {
-        if (claimOwnership.isEmpty()) {
-            return false;
-        }
-        Set<String> ownerData = claimOwnership.get(loc);
-        return ownerData != null && ownerData.contains(player.getId());
-    }
-
-    public void setPlayerAsOwner(FPlayer player, FLocation loc) {
-        Set<String> ownerData = claimOwnership.get(loc);
-        if (ownerData == null) {
-            ownerData = new HashSet<>();
-        }
-        ownerData.add(player.getId());
-        claimOwnership.put(loc, ownerData);
-    }
-
-    public void removePlayerAsOwner(FPlayer player, FLocation loc) {
-        Set<String> ownerData = claimOwnership.get(loc);
-        if (ownerData == null) {
-            return;
-        }
-        ownerData.remove(player.getId());
-        claimOwnership.put(loc, ownerData);
-    }
-
-    public Set<String> getOwnerList(FLocation loc) {
-        return claimOwnership.get(loc);
-    }
-
-    public String getOwnerListString(FLocation loc) {
-        Set<String> ownerData = claimOwnership.get(loc);
-        if (ownerData == null || ownerData.isEmpty()) {
-            return "";
-        }
-
-        StringBuilder ownerList = new StringBuilder();
-
-        for (String anOwnerData : ownerData) {
-            if (ownerList.length() > 0) {
-                ownerList.append(", ");
-            }
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(anOwnerData));
-            //TODO:TL
-            ownerList.append(offlinePlayer != null ? offlinePlayer.getName() : "null player");
-        }
-        return ownerList.toString();
-    }
-
-    public boolean playerHasOwnershipRights(FPlayer fplayer, FLocation loc) {
-        // in own faction, with sufficient role or permission to bypass
-        // ownership?
-        if (fplayer.getFaction() == this && (fplayer.getRole().isAtLeast(FactionsPlugin.getInstance().conf().factions().ownedArea().isModeratorsBypass() ? Role.MODERATOR : Role.ADMIN) || Permission.OWNERSHIP_BYPASS.has(fplayer.getPlayer()))) {
-            return true;
-        }
-
-        // make sure claimOwnership is initialized
-        if (claimOwnership.isEmpty()) {
-            return true;
-        }
-
-        // need to check the ownership list, then
-        Set<String> ownerData = claimOwnership.get(loc);
-
-        // if no owner list, owner list is empty, or player is in owner list,
-        // they're allowed
-        return ownerData == null || ownerData.isEmpty() || ownerData.contains(fplayer.getId());
-    }
-
-    // ----------------------------------------------//
     // Persistance and entity management
     // ----------------------------------------------//
     public void remove() {
-        if (Econ.shouldBeUsed() && FactionsPlugin.getInstance().conf().economy().isBankEnabled()) {
-            Econ.setBalance(this, 0);
-        }
-
         // Clean the board
         ((MemoryBoard) Board.getInstance()).clean(id);
 

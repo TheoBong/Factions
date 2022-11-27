@@ -9,7 +9,7 @@ public class CmdLeave extends FCommand {
         super();
         this.aliases.add("leave");
 
-        this.requirements = new CommandRequirements.Builder(Permission.LEAVE)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .memberOnly()
                 .build();
     }

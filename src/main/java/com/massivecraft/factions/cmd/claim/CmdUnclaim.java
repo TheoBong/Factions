@@ -19,7 +19,7 @@ public class CmdUnclaim extends FCommand {
         this.optionalArgs.put("radius", "1");
         this.optionalArgs.put("faction", "your");
 
-        this.requirements = new CommandRequirements.Builder(Permission.UNCLAIM)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .playerOnly()
                 .build();
     }
@@ -39,12 +39,6 @@ public class CmdUnclaim extends FCommand {
             // single chunk
             context.fPlayer.attemptUnclaim(forFaction, new FLocation(context.player), true);
         } else {
-            // radius claim
-            if (!Permission.CLAIM_RADIUS.has(context.sender, false)) {
-                context.msg(TL.COMMAND_CLAIM_DENIED);
-                return;
-            }
-
             new SpiralTask(new FLocation(context.player), radius) {
                 private int failCount = 0;
                 private final int limit = FactionsPlugin.getInstance().conf().factions().claims().getRadiusClaimFailureLimit() - 1;

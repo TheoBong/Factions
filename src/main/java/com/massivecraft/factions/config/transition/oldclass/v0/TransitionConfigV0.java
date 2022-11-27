@@ -3,11 +3,7 @@ package com.massivecraft.factions.config.transition.oldclass.v0;
 import com.massivecraft.factions.config.annotation.Comment;
 import org.bukkit.Material;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"InnerClassMayBeStatic", "FieldMayBeFinal", "unused", "FieldCanBeLocal", "UnusedAssignment", "MismatchedQueryAndUpdateOfCollection"})

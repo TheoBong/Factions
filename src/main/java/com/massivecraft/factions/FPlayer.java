@@ -277,17 +277,6 @@ public interface FPlayer extends EconomyParticipator, Selectable {
         return false;
     }
 
-    boolean isSeeingChunk();
-
-    void setSeeingChunk(boolean seeingChunk);
-
-    boolean getFlyTrailsState();
-
-    void setFlyTrailsState(boolean state);
-
-    String getFlyTrailsEffect();
-
-    void setFlyTrailsEffect(String effect);
 
     // -------------------------------
     // Warmups

@@ -19,7 +19,7 @@ public class FPromoteCommand extends FCommand {
 
         this.requiredArgs.add("player");
 
-        this.requirements = new CommandRequirements.Builder(Permission.PROMOTE)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .memberOnly()
                 .withAction(PermissibleActions.PROMOTE)
                 .build();

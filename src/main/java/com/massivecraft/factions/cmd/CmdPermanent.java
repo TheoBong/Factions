@@ -16,7 +16,7 @@ public class CmdPermanent extends FCommand {
 
         this.requiredArgs.add("faction");
 
-        this.requirements = new CommandRequirements.Builder(Permission.SET_PERMANENT).build();
+        this.requirements = new CommandRequirements.Builder(Permission.ADMIN).build();
     }
 
     @Override

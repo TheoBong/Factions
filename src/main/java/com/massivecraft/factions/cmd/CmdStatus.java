@@ -17,7 +17,7 @@ public class CmdStatus extends FCommand {
         this.aliases.add("status");
         this.aliases.add("s");
 
-        this.requirements = new CommandRequirements.Builder(Permission.STATUS)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .memberOnly()
                 .build();
     }

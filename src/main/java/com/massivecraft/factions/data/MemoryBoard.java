@@ -2,14 +2,7 @@ package com.massivecraft.factions.data;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.massivecraft.factions.Board;
-import com.massivecraft.factions.FLocation;
-import com.massivecraft.factions.FPlayer;
-import com.massivecraft.factions.FPlayers;
-import com.massivecraft.factions.Faction;
-import com.massivecraft.factions.Factions;
-import com.massivecraft.factions.FactionsPlugin;
-import com.massivecraft.factions.integration.LWC;
+import com.massivecraft.factions.*;
 import com.massivecraft.factions.perms.Relation;
 import com.massivecraft.factions.util.AsciiCompass;
 import com.massivecraft.factions.util.TL;
@@ -19,14 +12,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 public abstract class MemoryBoard extends Board {
 
@@ -106,7 +93,6 @@ public abstract class MemoryBoard extends Board {
     }
 
     public void setIdAt(String id, FLocation flocation) {
-        clearOwnershipAt(flocation);
 
         if (id.equals("0")) {
             removeAt(flocation);
@@ -120,8 +106,6 @@ public abstract class MemoryBoard extends Board {
     }
 
     public void removeAt(FLocation flocation) {
-        Faction faction = getFactionAt(flocation);
-        faction.getWarps().values().removeIf(lazyLocation -> flocation.isInChunk(lazyLocation.getLocation()));
         for (Entity entity : flocation.getChunk().getEntities()) {
             if (entity instanceof Player) {
                 FPlayer fPlayer = FPlayers.getInstance().getByPlayer((Player) entity);
@@ -134,7 +118,6 @@ public abstract class MemoryBoard extends Board {
                 }
             }
         }
-        clearOwnershipAt(flocation);
         flocationIds.remove(flocation);
     }
 
@@ -152,20 +135,7 @@ public abstract class MemoryBoard extends Board {
         return getAllClaims(faction.getId());
     }
 
-    // not to be confused with claims, ownership referring to further member-specific ownership of a claim
-    public void clearOwnershipAt(FLocation flocation) {
-        Faction faction = getFactionAt(flocation);
-        if (faction != null && faction.isNormal()) {
-            faction.clearClaimOwnership(flocation);
-        }
-    }
-
     public void unclaimAll(String factionId) {
-        Faction faction = Factions.getInstance().getFactionById(factionId);
-        if (faction != null && faction.isNormal()) {
-            faction.clearAllClaimOwnership();
-            faction.clearWarps();
-        }
         clean(factionId);
     }
 
@@ -178,14 +148,6 @@ public abstract class MemoryBoard extends Board {
     }
 
     public void clean(String factionId) {
-        if (LWC.getEnabled() && FactionsPlugin.getInstance().conf().lwc().isResetLocksOnUnclaim()) {
-            for (Entry<FLocation, String> entry : flocationIds.entrySet()) {
-                if (entry.getValue().equals(factionId)) {
-                    LWC.clearAllLocks(entry.getKey());
-                }
-            }
-        }
-
         flocationIds.removeFaction(factionId);
     }
 
@@ -246,9 +208,6 @@ public abstract class MemoryBoard extends Board {
         while (iter.hasNext()) {
             Entry<FLocation, String> entry = iter.next();
             if (!Factions.getInstance().isValidFactionId(entry.getValue())) {
-                if (LWC.getEnabled() && FactionsPlugin.getInstance().conf().lwc().isResetLocksOnUnclaim()) {
-                    LWC.clearAllLocks(entry.getKey());
-                }
                 FactionsPlugin.getInstance().log("Board cleaner removed " + entry.getValue() + " from " + entry.getKey());
                 iter.remove();
             }

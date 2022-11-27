@@ -1,29 +1,17 @@
 package com.massivecraft.factions.listeners;
 
-import com.massivecraft.factions.Board;
-import com.massivecraft.factions.FLocation;
-import com.massivecraft.factions.FPlayer;
-import com.massivecraft.factions.FPlayers;
-import com.massivecraft.factions.Faction;
-import com.massivecraft.factions.FactionsPlugin;
+import com.massivecraft.factions.*;
 import com.massivecraft.factions.config.file.MainConfig;
 import com.massivecraft.factions.perms.PermissibleAction;
 import com.massivecraft.factions.perms.PermissibleActions;
 import com.massivecraft.factions.perms.Relation;
 import com.massivecraft.factions.struct.Permission;
 import com.massivecraft.factions.util.TL;
-import com.massivecraft.factions.util.TextUtil;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Fireball;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.TNTPrimed;
-import org.bukkit.entity.Wither;
-import org.bukkit.entity.WitherSkull;
+import org.bukkit.entity.*;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Listener;
@@ -64,13 +52,13 @@ public abstract class AbstractListener implements Listener {
             me.msg(TL.PLAYER_USE_WILDERNESS, "this");
             return false;
         } else if (otherFaction.isSafeZone()) {
-            if (!protection.isSafeZoneDenyUsage() || Permission.MANAGE_SAFE_ZONE.has(player)) {
+            if (!protection.isSafeZoneDenyUsage() || Permission.ADMIN.has(player)) {
                 return true;
             }
             me.msg(TL.PLAYER_USE_SAFEZONE, "this");
             return false;
         } else if (otherFaction.isWarZone()) {
-            if (!protection.isWarZoneDenyUsage() || Permission.MANAGE_WAR_ZONE.has(player)) {
+            if (!protection.isWarZoneDenyUsage() || Permission.ADMIN.has(player)) {
                 return true;
             }
             me.msg(TL.PLAYER_USE_WARZONE, "this");
@@ -83,12 +71,6 @@ public abstract class AbstractListener implements Listener {
         // Cancel if we are not in our own territory
         if (!access) {
             me.msg(TL.PLAYER_USE_TERRITORY, "this", otherFaction.getTag(me.getFaction()));
-            return false;
-        }
-
-        // Also cancel if player doesn't have ownership rights for this claim
-        if (FactionsPlugin.getInstance().conf().factions().ownedArea().isEnabled() && FactionsPlugin.getInstance().conf().factions().ownedArea().isDenyUsage() && !otherFaction.playerHasOwnershipRights(me, loc)) {
-            me.msg(TL.PLAYER_USE_OWNED, "this", otherFaction.getOwnerListString(loc));
             return false;
         }
 
@@ -132,13 +114,11 @@ public abstract class AbstractListener implements Listener {
                         case WATER:
                         case LAVA:
                         case OBSIDIAN:
-                        case NETHER_PORTAL:
-                        case ENCHANTING_TABLE:
+                        case PORTAL:
+                        case ENCHANTMENT_TABLE:
                         case ANVIL:
-                        case CHIPPED_ANVIL:
-                        case DAMAGED_ANVIL:
-                        case END_PORTAL:
-                        case END_PORTAL_FRAME:
+                        case ENDER_PORTAL:
+                        case ENDER_PORTAL_FRAME:
                         case ENDER_CHEST:
                             continue;
                     }
@@ -208,7 +188,6 @@ public abstract class AbstractListener implements Listener {
         if (!otherFaction.isNormal()) {
             switch (material) {
                 case ITEM_FRAME:
-                case GLOW_ITEM_FRAME:
                 case ARMOR_STAND:
                     return canInteractHere(player, location);
             }
@@ -226,12 +205,6 @@ public abstract class AbstractListener implements Listener {
                 action = PermissibleActions.LEVER;
                 break;
             case STONE_BUTTON:
-            case BIRCH_BUTTON:
-            case ACACIA_BUTTON:
-            case DARK_OAK_BUTTON:
-            case JUNGLE_BUTTON:
-            case OAK_BUTTON:
-            case SPRUCE_BUTTON:
                 action = PermissibleActions.BUTTON;
                 break;
             case DARK_OAK_DOOR:
@@ -240,46 +213,26 @@ public abstract class AbstractListener implements Listener {
             case IRON_DOOR:
             case JUNGLE_DOOR:
             case SPRUCE_DOOR:
-            case ACACIA_TRAPDOOR:
-            case OAK_DOOR:
-            case BIRCH_TRAPDOOR:
-            case DARK_OAK_TRAPDOOR:
             case IRON_TRAPDOOR:
-            case JUNGLE_TRAPDOOR:
-            case OAK_TRAPDOOR:
-            case SPRUCE_TRAPDOOR:
                 action = PermissibleActions.DOOR;
                 break;
             case CHEST:
             case ENDER_CHEST:
             case TRAPPED_CHEST:
-            case BARREL:
             case FURNACE:
             case DROPPER:
             case DISPENSER:
             case HOPPER:
-            case BLAST_FURNACE:
             case CAULDRON:
-            case CAMPFIRE:
             case BREWING_STAND:
-            case CARTOGRAPHY_TABLE:
-            case GRINDSTONE:
-            case SMOKER:
-            case STONECUTTER:
-            case LECTERN:
             case ITEM_FRAME:
-            case GLOW_ITEM_FRAME:
             case JUKEBOX:
             case ARMOR_STAND:
-            case REPEATER:
-            case ENCHANTING_TABLE:
-            case FARMLAND:
+            case DIODE:
+            case ENCHANTMENT_TABLE:
             case BEACON:
             case ANVIL:
-            case CHIPPED_ANVIL:
-            case DAMAGED_ANVIL:
             case FLOWER_POT:
-            case BEE_NEST:
                 action = PermissibleActions.CONTAINER;
                 break;
             default:
@@ -337,23 +290,11 @@ public abstract class AbstractListener implements Listener {
         // Dupe fix.
         Faction myFaction = me.getFaction();
         Relation rel = myFaction.getRelationTo(otherFaction);
-        if (FactionsPlugin.getInstance().conf().exploits().doPreventDuping() &&
-                (!rel.isMember() || !otherFaction.playerHasOwnershipRights(me, loc))) {
+        if (FactionsPlugin.getInstance().conf().exploits().doPreventDuping() && !rel.isMember()) {
             Material mainHand = player.getItemInHand().getType();
 
             // Check if material is at risk for dupe in either hand.
-            if (isDupeMaterial(mainHand)) {
-                return false;
-            }
-        }
-
-        // Also cancel if player doesn't have ownership rights for this claim
-        if (FactionsPlugin.getInstance().conf().factions().ownedArea().isEnabled() && FactionsPlugin.getInstance().conf().factions().ownedArea().isProtectMaterials() && !otherFaction.playerHasOwnershipRights(me, loc)) {
-            if (!justCheck) {
-                me.msg(TL.PLAYER_USE_OWNED, TextUtil.getMaterialName(material), otherFaction.getOwnerListString(loc));
-            }
-
-            return false;
+            return !isDupeMaterial(mainHand);
         }
 
         return true;
@@ -371,7 +312,7 @@ public abstract class AbstractListener implements Listener {
             case ACACIA_DOOR:
             case BIRCH_DOOR:
             case JUNGLE_DOOR:
-            case OAK_DOOR:
+            case WOOD_DOOR:
             case SPRUCE_DOOR:
             case IRON_DOOR:
                 return true;

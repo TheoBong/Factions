@@ -3,12 +3,7 @@ package com.massivecraft.factions.config.transition.oldclass.v0;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class OldConfV0 {
     List<String> baseCommandAliases = new ArrayList<>();

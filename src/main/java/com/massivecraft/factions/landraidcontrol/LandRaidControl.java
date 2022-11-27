@@ -7,13 +7,7 @@ import org.bukkit.entity.Player;
 
 public interface LandRaidControl {
     static LandRaidControl getByName(String name) {
-        switch (name.toLowerCase()) {
-            case "dtr":
-                return new DTRControl();
-            case "power":
-            default:
-                return new PowerControl();
-        }
+        return new PowerControl();
     }
 
     boolean isRaidable(Faction faction);

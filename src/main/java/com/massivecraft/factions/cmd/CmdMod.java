@@ -20,7 +20,7 @@ public class CmdMod extends FCommand {
 
         this.optionalArgs.put("player", "player");
 
-        this.requirements = new CommandRequirements.Builder(Permission.MOD)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .memberOnly()
                 .withRole(Role.COLEADER)
                 .build();
@@ -40,7 +40,7 @@ public class CmdMod extends FCommand {
             return;
         }
 
-        boolean permAny = Permission.MOD_ANY.has(context.sender, false);
+        boolean permAny = Permission.ADMIN.has(context.sender, false);
         Faction targetFaction = you.getFaction();
 
         if (targetFaction != context.faction && !permAny) {

@@ -13,13 +13,8 @@ import com.massivecraft.factions.util.UUIDFetcher;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Level;
 
 public class JSONFactions extends MemoryFactions {
@@ -38,9 +33,6 @@ public class JSONFactions extends MemoryFactions {
     // -------------------------------------------- //
 
     public JSONFactions() {
-        if (FactionsPlugin.getInstance().getServerUUID() == null) {
-            FactionsPlugin.getInstance().grumpException(new RuntimeException());
-        }
         this.file = new File(FactionsPlugin.getInstance().getDataFolder(), "data/factions.json");
         this.nextId = 1;
     }
@@ -56,7 +48,6 @@ public class JSONFactions extends MemoryFactions {
         }
 
         JSONFaction f = new JSONFaction("```storage``");
-        f.setMaxVaults(this.nextId);
         f.setDescription("Storage-only faction, not present in game. Do not touch.");
         f.setFoundedDate(0);
         f.getPermissions().clear();
@@ -72,10 +63,6 @@ public class JSONFactions extends MemoryFactions {
     public int load() {
         Map<String, JSONFaction> factions = this.loadCore();
         if (factions != null) {
-            Faction storage = factions.remove("```storage``");
-            if (storage != null) {
-                this.nextId = Math.max(this.nextId, storage.getMaxVaults());
-            }
             this.factions.putAll(factions);
         }
 
@@ -107,9 +94,6 @@ public class JSONFactions extends MemoryFactions {
             f.setId(id);
             this.updateNextIdForId(id);
             needsUpdate += whichKeysNeedMigration(f.getInvites()).size();
-            for (Set<String> keys : f.getClaimOwnership().values()) {
-                needsUpdate += whichKeysNeedMigration(keys).size();
-            }
         }
 
         if (needsUpdate > 0) {
@@ -128,36 +112,6 @@ public class JSONFactions extends MemoryFactions {
             FactionsPlugin.getInstance().log(Level.INFO, "Backed up your old data at " + file.getAbsolutePath());
 
             FactionsPlugin.getInstance().log(Level.INFO, "Please wait while Factions converts " + needsUpdate + " old player names to UUID. This may take a while.");
-
-            // Update claim ownership
-
-            for (String string : data.keySet()) {
-                Faction f = data.get(string);
-                Map<FLocation, Set<String>> claims = f.getClaimOwnership();
-                for (FLocation key : claims.keySet()) {
-                    Set<String> set = claims.get(key);
-
-                    Set<String> list = whichKeysNeedMigration(set);
-
-                    if (list.size() > 0) {
-                        UUIDFetcher fetcher = new UUIDFetcher(new ArrayList<>(list));
-                        try {
-                            Map<String, UUID> response = fetcher.call();
-                            for (String value : response.keySet()) {
-                                // Let's replace their old named entry with a
-                                // UUID key
-                                String id = response.get(value).toString();
-                                set.remove(value.toLowerCase()); // Out with the
-                                // old...
-                                set.add(id); // And in with the new
-                            }
-                        } catch (Exception e) {
-                            FactionsPlugin.getInstance().getLogger().log(Level.SEVERE, "Encountered exception looking up UUIDs", e);
-                        }
-                        claims.put(key, set); // Update
-                    }
-                }
-            }
 
             // Update invites
 

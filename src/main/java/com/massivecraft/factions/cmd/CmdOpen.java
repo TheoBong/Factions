@@ -15,7 +15,7 @@ public class CmdOpen extends FCommand {
 
         this.optionalArgs.put("yes/no", "flip");
 
-        this.requirements = new CommandRequirements.Builder(Permission.OPEN)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .playerOnly()
                 .noDisableOnLock()
                 .withRole(Role.MODERATOR)
@@ -24,10 +24,6 @@ public class CmdOpen extends FCommand {
 
     @Override
     public void perform(CommandContext context) {
-        // if economy is enabled, they're not on the bypass list, and this command has a cost set, make 'em pay
-        if (!context.payForCommand(FactionsPlugin.getInstance().conf().economy().getCostOpen(), TL.COMMAND_OPEN_TOOPEN, TL.COMMAND_OPEN_FOROPEN)) {
-            return;
-        }
 
         context.faction.setOpen(context.argAsBool(0, !context.faction.getOpen()));
 

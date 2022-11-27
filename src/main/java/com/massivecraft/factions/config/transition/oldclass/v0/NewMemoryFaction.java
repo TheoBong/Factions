@@ -3,7 +3,6 @@ package com.massivecraft.factions.config.transition.oldclass.v0;
 import com.massivecraft.factions.FLocation;
 import com.massivecraft.factions.perms.Relation;
 import com.massivecraft.factions.perms.Role;
-import com.massivecraft.factions.struct.BanInfo;
 import com.massivecraft.factions.util.LazyLocation;
 
 import java.util.HashMap;
@@ -36,7 +35,6 @@ public class NewMemoryFaction {
     private Role defaultRole;
     private Map<String, Map<String, Boolean>> permissions;
     private Map<String, Map<String, Boolean>> permissionsOffline;
-    private Set<BanInfo> bans;
 
     public NewMemoryFaction(OldMemoryFactionV0 old) {
         this.id = old.id;
@@ -83,6 +81,5 @@ public class NewMemoryFaction {
             this.permissions.put(permiss, newMap);
             this.permissionsOffline.put(permiss, newMap);
         });
-        this.bans = old.bans;
     }
 }

@@ -48,10 +48,6 @@ public interface Tag {
             return line;
         }
 
-        if (FactionsPlugin.getInstance().isClipPlaceholderAPIHooked() && player.isOnline()) {
-            line = PlaceholderAPI.setPlaceholders(player, line);
-        }
-
         if (FactionsPlugin.getInstance().isMVdWPlaceholderAPIHooked() && player.isOnline()) {
             String maybe = be.maximvdw.placeholderapi.PlaceholderAPI.replacePlaceholders(player, line);
             if (maybe != null) {

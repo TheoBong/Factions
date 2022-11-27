@@ -12,7 +12,7 @@ public class CmdCoords extends FCommand {
         this.aliases.add("coords");
         this.aliases.add("coord");
 
-        this.requirements = new CommandRequirements.Builder(Permission.COORDS)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .memberOnly()
                 .build();
     }

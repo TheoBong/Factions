@@ -17,7 +17,7 @@ public class CmdModifyPower extends FCommand {
         this.requiredArgs.add("name");
         this.requiredArgs.add("power");
 
-        this.requirements = new CommandRequirements.Builder(Permission.MODIFY_POWER).build();
+        this.requirements = new CommandRequirements.Builder(Permission.ADMIN).build();
     }
 
     @Override

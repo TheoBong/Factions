@@ -11,7 +11,7 @@ public class CmdDelhome extends FCommand {
     public CmdDelhome() {
         this.aliases.add("delhome");
 
-        this.requirements = new CommandRequirements.Builder(Permission.DELHOME)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .memberOnly()
                 .withAction(PermissibleActions.SETHOME)
                 .build();
@@ -27,15 +27,6 @@ public class CmdDelhome extends FCommand {
         if (!context.faction.hasHome()) {
             context.msg(TL.COMMAND_HOME_NOHOME.toString() + (context.fPlayer.getRole().value < Role.MODERATOR.value ? TL.GENERIC_ASKYOURLEADER.toString() : TL.GENERIC_YOUSHOULD.toString()));
             context.sendMessage(FCmdRoot.getInstance().cmdSethome.getUsageTemplate(context));
-            return;
-        }
-
-        if (FactionsPlugin.getInstance().conf().factions().homes().isRequiredToHaveHomeBeforeSettingWarps() && context.faction.getWarps().size() > 0) {
-            context.msg(TL.COMMAND_HOME_WARPSREMAIN);
-            return;
-        }
-
-        if (!context.payForCommand(FactionsPlugin.getInstance().conf().economy().getCostDelhome(), TL.COMMAND_DELHOME_TOSET, TL.COMMAND_DELHOME_FORSET)) {
             return;
         }
 

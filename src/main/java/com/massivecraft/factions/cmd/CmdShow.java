@@ -18,12 +18,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CmdShow extends FCommand {
@@ -39,19 +34,15 @@ public class CmdShow extends FCommand {
         defaults.add("<a>Description: <i>{description}");
         defaults.add("<a>Joining: <i>{joining}    {peaceful}");
         defaults.add("<a>Land / Power / Maxpower: <i> {chunks} / {power} / {maxPower}");
-        defaults.add("<a>Raidable: {raidable}");
         defaults.add("<a>Founded: <i>{create-date}");
         defaults.add("<a>This faction is permanent, remaining even with no members.");
-        defaults.add("<a>Land value: <i>{land-value} {land-refund}");
-        defaults.add("<a>Balance: <i>{faction-balance}");
-        defaults.add("<a>Bans: <i>{faction-bancount}");
         defaults.add("<a>Allies(<i>{allies}<a>/<i>{max-allies}<a>): {allies-list}");
         defaults.add("<a>Online: (<i>{online}<a>/<i>{members}<a>): {online-list}");
         defaults.add("<a>Offline: (<i>{offline}<a>/<i>{members}<a>): {offline-list}");
 
         this.optionalArgs.put("faction tag", "yours");
 
-        this.requirements = new CommandRequirements.Builder(Permission.SHOW).noDisableOnLock().build();
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE).noDisableOnLock().build();
     }
 
     @Override
@@ -64,14 +55,9 @@ public class CmdShow extends FCommand {
             return;
         }
 
-        if (context.fPlayer != null && !context.player.hasPermission(Permission.SHOW_BYPASS_EXEMPT.toString())
+        if (context.fPlayer != null && !context.player.hasPermission(Permission.ADMIN.toString())
                 && FactionsPlugin.getInstance().conf().commands().show().getExempt().contains(faction.getTag())) {
             context.msg(TL.COMMAND_SHOW_EXEMPT);
-            return;
-        }
-
-        // if economy is enabled, they're not on the bypass list, and this command has a cost set, make 'em pay
-        if (!context.payForCommand(FactionsPlugin.getInstance().conf().economy().getCostShow(), TL.COMMAND_SHOW_TOSHOW, TL.COMMAND_SHOW_FORSHOW)) {
             return;
         }
 
@@ -114,11 +100,8 @@ public class CmdShow extends FCommand {
                 messageList.add(parsed);
             }
         }
-        if (context.fPlayer != null && this.groupPresent()) {
-            new GroupGetter(messageList, context.fPlayer, faction).runTaskAsynchronously(FactionsPlugin.getInstance());
-        } else {
-            this.sendMessages(messageList, context.sender, faction, context.fPlayer);
-        }
+
+        this.sendMessages(messageList, context.sender, faction, context.fPlayer);
     }
 
     private void sendMessages(List<String> messageList, CommandSender recipient, Faction faction, FPlayer player) {
@@ -185,60 +168,6 @@ public class CmdShow extends FCommand {
             }
         }
         recipient.sendMessage(FactionsPlugin.getInstance().txt().parse(builder.toString()));
-    }
-
-    private boolean groupPresent() {
-        for (String line : FactionsPlugin.getInstance().conf().commands().toolTips().getPlayer()) {
-            if (line.contains("{group}")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private class GroupGetter extends BukkitRunnable {
-        private final List<String> messageList;
-        private final FPlayer sender;
-        private final Faction faction;
-        private final Set<OfflinePlayer> players;
-
-        private GroupGetter(List<String> messageList, FPlayer sender, Faction faction) {
-            this.messageList = messageList;
-            this.sender = sender;
-            this.faction = faction;
-            this.players = faction.getFPlayers().stream().map(fp -> Bukkit.getOfflinePlayer(UUID.fromString(fp.getId()))).collect(Collectors.toSet());
-        }
-
-        @Override
-        public void run() {
-            Map<UUID, String> map = new HashMap<>();
-            for (OfflinePlayer player : this.players) {
-                map.put(player.getUniqueId(), FactionsPlugin.getInstance().getPrimaryGroup(player));
-            }
-            new Sender(this.messageList, this.sender, this.faction, map).runTask(FactionsPlugin.getInstance());
-        }
-    }
-
-    private class Sender extends BukkitRunnable {
-        private final List<String> messageList;
-        private final FPlayer sender;
-        private final Faction faction;
-        private final Map<UUID, String> map;
-
-        private Sender(List<String> messageList, FPlayer sender, Faction faction, Map<UUID, String> map) {
-            this.messageList = messageList;
-            this.sender = sender;
-            this.faction = faction;
-            this.map = map;
-        }
-
-        @Override
-        public void run() {
-            Player player = Bukkit.getPlayerExact(sender.getName());
-            if (player != null) {
-                CmdShow.this.sendMessages(messageList, player, faction, sender, map);
-            }
-        }
     }
 
     @Override

@@ -14,22 +14,13 @@ public class CmdPower extends FCommand {
 
         this.optionalArgs.put("player", "you");
 
-        this.requirements = new CommandRequirements.Builder(Permission.POWER).noDisableOnLock().build();
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE).noDisableOnLock().build();
     }
 
     @Override
     public void perform(CommandContext context) {
         FPlayer target = context.argAsBestFPlayerMatch(0, context.fPlayer);
         if (target == null) {
-            return;
-        }
-
-        if (target != context.fPlayer && !Permission.POWER_ANY.has(context.sender, true)) {
-            return;
-        }
-
-        // if economy is enabled, they're not on the bypass list, and this command has a cost set, make 'em pay
-        if (!context.payForCommand(FactionsPlugin.getInstance().conf().economy().getCostPower(), TL.COMMAND_POWER_TOSHOW, TL.COMMAND_POWER_FORSHOW)) {
             return;
         }
 

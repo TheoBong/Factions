@@ -15,7 +15,7 @@ public class CmdMap extends FCommand {
 
         this.optionalArgs.put("on/off", "once");
 
-        this.requirements = new CommandRequirements.Builder(Permission.MAP)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .playerOnly()
                 .noDisableOnLock()
                 .build();
@@ -26,11 +26,6 @@ public class CmdMap extends FCommand {
         if (context.argIsSet(0)) {
             if (context.argAsBool(0, !context.fPlayer.isMapAutoUpdating())) {
                 // Turn on
-
-                // if economy is enabled, they're not on the bypass list, and this command has a cost set, make 'em pay
-                if (!context.payForCommand(FactionsPlugin.getInstance().conf().economy().getCostMap(), "to show the map", "for showing the map")) {
-                    return;
-                }
 
                 context.fPlayer.setMapAutoUpdating(true);
                 context.msg(TL.COMMAND_MAP_UPDATE_ENABLED);
@@ -43,11 +38,6 @@ public class CmdMap extends FCommand {
                 context.msg(TL.COMMAND_MAP_UPDATE_DISABLED);
             }
         } else {
-            // if economy is enabled, they're not on the bypass list, and this command has a cost set, make 'em pay
-            if (!context.payForCommand(FactionsPlugin.getInstance().conf().economy().getCostMap(), TL.COMMAND_MAP_TOSHOW, TL.COMMAND_MAP_FORSHOW)) {
-                return;
-            }
-
             showMap(context);
         }
     }

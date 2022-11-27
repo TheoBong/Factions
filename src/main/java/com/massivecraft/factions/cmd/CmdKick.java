@@ -20,7 +20,7 @@ public class CmdKick extends FCommand {
 
         this.optionalArgs.put("player", "player");
 
-        this.requirements = new CommandRequirements.Builder(Permission.KICK)
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE)
                 .memberOnly()
                 .withAction(PermissibleActions.KICK)
                 .noDisableOnLock()
@@ -69,7 +69,7 @@ public class CmdKick extends FCommand {
         }
 
         // players with admin-level "disband" permission can bypass these requirements
-        if (!Permission.KICK_ANY.has(context.sender)) {
+        if (!Permission.ADMIN.has(context.sender)) {
             if (toKickFaction != context.faction) {
                 context.msg(TL.COMMAND_KICK_NOTMEMBER, toKick.describeTo(context.fPlayer, true), context.faction.describeTo(context.fPlayer));
                 return;
@@ -85,20 +85,10 @@ public class CmdKick extends FCommand {
             }
         }
 
-        // if economy is enabled, they're not on the bypass list, and this command has a cost set, make sure they can pay
-        if (!context.canAffordCommand(FactionsPlugin.getInstance().conf().economy().getCostKick(), TL.COMMAND_KICK_TOKICK.toString())) {
-            return;
-        }
-
         // trigger the leave event (cancellable) [reason:kicked]
         FPlayerLeaveEvent event = new FPlayerLeaveEvent(toKick, toKick.getFaction(), FPlayerLeaveEvent.PlayerLeaveReason.KICKED);
         Bukkit.getServer().getPluginManager().callEvent(event);
         if (event.isCancelled()) {
-            return;
-        }
-
-        // then make 'em pay (if applicable)
-        if (!context.payForCommand(FactionsPlugin.getInstance().conf().economy().getCostKick(), TL.COMMAND_KICK_TOKICK.toString(), TL.COMMAND_KICK_FORKICK.toString())) {
             return;
         }
 

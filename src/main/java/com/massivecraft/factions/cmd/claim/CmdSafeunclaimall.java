@@ -19,7 +19,7 @@ public class CmdSafeunclaimall extends FCommand {
 
         this.optionalArgs.put("world", "all");
 
-        this.requirements = new CommandRequirements.Builder(Permission.MANAGE_SAFE_ZONE).build();
+        this.requirements = new CommandRequirements.Builder(Permission.ADMIN).build();
     }
 
     @Override

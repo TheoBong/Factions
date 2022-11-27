@@ -21,7 +21,7 @@ public class CmdAdmin extends FCommand {
 
         this.requiredArgs.add("player");
 
-        this.requirements = new CommandRequirements.Builder(Permission.ADMIN).build();
+        this.requirements = new CommandRequirements.Builder(Permission.EVERYONE).build();
     }
 
     @Override
@@ -31,7 +31,7 @@ public class CmdAdmin extends FCommand {
             return;
         }
 
-        boolean permAny = Permission.ADMIN_ANY.has(context.sender, false);
+        boolean permAny = Permission.ADMIN.has(context.sender, false);
         Faction targetFaction = fyou.getFaction();
 
         if (targetFaction != context.faction && !permAny) {
