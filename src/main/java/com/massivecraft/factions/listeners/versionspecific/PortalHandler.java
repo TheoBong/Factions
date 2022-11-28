@@ -1,6 +1,7 @@
 package com.massivecraft.factions.listeners.versionspecific;
 
 import com.massivecraft.factions.*;
+import com.massivecraft.factions.listeners.PortalListenerBase;
 import com.massivecraft.factions.perms.Relation;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

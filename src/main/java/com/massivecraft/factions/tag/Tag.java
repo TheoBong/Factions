@@ -3,7 +3,6 @@ package com.massivecraft.factions.tag;
 import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.FactionsPlugin;
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 
 public interface Tag {
@@ -46,15 +45,6 @@ public interface Tag {
     static String parsePlaceholders(Player player, String line) {
         if (player == null || line == null) {
             return line;
-        }
-
-        if (FactionsPlugin.getInstance().isMVdWPlaceholderAPIHooked() && player.isOnline()) {
-            String maybe = be.maximvdw.placeholderapi.PlaceholderAPI.replacePlaceholders(player, line);
-            if (maybe != null) {
-                line = maybe;
-                // Amazing feature where, if the user makes a mistake and does not install any other MVdW plugins,
-                //   it will simply return null to break everything down the line.
-            }
         }
 
         return line;

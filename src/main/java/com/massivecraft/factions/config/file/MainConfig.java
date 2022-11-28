@@ -2813,14 +2813,6 @@ public class MainConfig {
         }
     }
 
-    public class Paper {
-        @Comment("Utilize Paper's async teleportation if available (Paper 1.9+).")
-        private boolean asyncTeleport = true;
-
-        public boolean isAsyncTeleport() {
-            return asyncTeleport;
-        }
-    }
 
     public class Plugins {
         public class Graves {
@@ -2947,8 +2939,6 @@ public class MainConfig {
     private LWC lwc = new LWC();
     @Comment("Integration with the Magic plugin")
     private MagicPlugin magicPlugin = new MagicPlugin();
-    @Comment("Paper features, when accessible.")
-    private Paper paper = new Paper();
     @Comment("Lists plugin integrations. Some other plugins (PVX, LWC, Magic, WG, WB) are currently\n" +
             " elsewhere but will migrate here in the future")
     private Plugins plugins = new Plugins();
@@ -3007,10 +2997,6 @@ public class MainConfig {
 
     public MagicPlugin magicPlugin() {
         return magicPlugin;
-    }
-
-    public Paper paper() {
-        return paper;
     }
 
     public PlayerVaults playerVaults() {

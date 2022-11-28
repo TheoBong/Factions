@@ -13,7 +13,6 @@ import com.massivecraft.factions.event.FactionsPluginRegistrationTimeEvent;
 import com.massivecraft.factions.landraidcontrol.LandRaidControl;
 import com.massivecraft.factions.listeners.*;
 import com.massivecraft.factions.listeners.versionspecific.PortalHandler;
-import com.massivecraft.factions.listeners.versionspecific.PortalListenerLegacy;
 import com.massivecraft.factions.perms.PermSelector;
 import com.massivecraft.factions.perms.PermSelectorRegistry;
 import com.massivecraft.factions.perms.PermSelectorTypeAdapter;
@@ -22,7 +21,6 @@ import com.massivecraft.factions.struct.ChatMode;
 import com.massivecraft.factions.util.*;
 import com.massivecraft.factions.util.material.MaterialDb;
 import com.mojang.authlib.GameProfile;
-import io.papermc.lib.PaperLib;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
@@ -733,11 +731,7 @@ public class FactionsPlugin extends JavaPlugin implements FactionsAPI {
     }
 
     public CompletableFuture<Boolean> teleport(Player player, Location location) {
-        if (this.conf().paper().isAsyncTeleport()) {
-            return PaperLib.teleportAsync(player, location, PlayerTeleportEvent.TeleportCause.PLUGIN);
-        } else {
-            return CompletableFuture.completedFuture(player.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN));
-        }
+        return CompletableFuture.completedFuture(player.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN));
     }
 
     public OfflinePlayer getFactionOfflinePlayer(String name) {
